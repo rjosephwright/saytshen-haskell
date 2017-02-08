@@ -36,3 +36,6 @@ data Benchmark = Benchmark
   } deriving (Generic, Show)
 
 instance FromJSON Benchmark
+
+runScan :: IO ()
+runScan = putStrLn "hello"
