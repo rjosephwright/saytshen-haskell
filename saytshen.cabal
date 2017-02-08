@@ -1,0 +1,58 @@
+name:                saytshen
+version:             0.1.0
+synopsis:            A tool for running security compliance scans.
+
+license:             MIT
+license-file:        LICENSE
+author:              Joseph Wright
+maintainer:          rjosephwright@gmail.com
+copyright:           © 2017 Joseph Wright
+homepage:            https://github.com/rjosephwright/saytshen
+bug-reports:         https://github.com/rjosephwright/saytshen/issues
+
+category:            System
+build-type:          Simple
+stability:           alpha (experimental)
+cabal-version:       >=1.10
+
+extra-source-files:
+  README.md
+  stack.yaml
+
+source-repository head
+  type:     git
+  location: https://github.com/rjosephwright/saytshen
+
+library
+  default-language:  Haskell2010
+  ghc-options:       -Wall -O2
+  hs-source-dirs:    src/lib
+  exposed-modules:   Scan
+  build-depends:     base >= 4.8 && < 5
+                   , bytestring == 0.10.8.1
+                   , process == 1.4.2.0
+                   , text == 1.2.2.1
+                   , yaml == 0.8.21.2
+
+executable saytshen
+  default-language:  Haskell2010
+  ghc-options:       -Wall -O2 -threaded -rtsopts -with-rtsopts=-N
+  hs-source-dirs:    src/bin
+  main-is:           saytshen.hs
+  build-depends:     base >= 4.8 && < 5
+                   , saytshen
+
+test-suite saytshen-test
+  type:              exitcode-stdio-1.0
+  default-language:  Haskell2010
+  ghc-options:       -Wall -O2 -threaded -rtsopts -with-rtsopts=-N
+  hs-source-dirs:    test
+  main-is:           main.hs
+  build-depends:     base >= 4.8 && < 5
+                   , raw-strings-qq == 1.1
+                   , tasty >= 0.11
+                   , tasty-hunit >= 0.9
+                   , tasty-smallcheck >= 0.8
+                   , text == 1.2.2.1
+                   , yaml == 0.8.21.2
+                   , saytshen
