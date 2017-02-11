@@ -95,5 +95,5 @@ runOneBenchmark =
           ]
         , mode = Nothing, skip = Nothing
         } in do
-    res <- runBenchmark benchmark
-    (map (\r -> (passedR r)) res) @?= ([False] :: [Bool])
+    result <- runBenchmark benchmark
+    (map (\res -> (passedR res)) result) @?= ([False] :: [Bool])
