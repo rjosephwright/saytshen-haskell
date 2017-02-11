@@ -20,6 +20,7 @@ ymlTests :: [TestTree]
 ymlTests =
   [ testCase "Parse the YAML" parseOneBenchmark
   , testCase "Parse more YAML" parseTwoBenchmarks
+  , testCase "Run a benchmark" runOneBenchmark
   ]
 
 parseOneBenchmark :: Assertion
@@ -79,3 +80,20 @@ parseTwoBenchmarks =
         (mode b2)                  @?= (Nothing :: Maybe Mode)
       Right v -> assertFailure (show v)
       Left e -> assertFailure (show e)
+
+runOneBenchmark :: Assertion
+runOneBenchmark =
+  let benchmark = Benchmark
+        { section = "1.1.6"
+        , description = "Ensure separate partition exists for /var"
+        , audit = [
+            AuditStep
+            -- TODO: fix this janky testing strategy for running commands.
+            { run = "mountzz | grep -E '.* on /var type'"
+            , expect = Nothing
+            }
+          ]
+        , mode = Nothing, skip = Nothing
+        } in do
+    res <- runBenchmark benchmark
+    (map (\r -> (passedR r)) res) @?= ([False] :: [Bool])
