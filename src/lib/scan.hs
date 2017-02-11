@@ -9,6 +9,7 @@ module Scan
   , BenchmarkResult(..)
   ) where
 
+import Data.Maybe (fromMaybe, isJust)
 import Data.Text (Text, pack, unpack)
 import Data.Yaml (FromJSON(..))
 import GHC.Generics
@@ -46,23 +47,35 @@ data BenchmarkResult = BenchmarkResult
   , skipR :: Maybe Text
   } deriving (Generic, Show)
 
-runScript :: Text -> IO (ExitCode, String, String)
+type CommandResult = (ExitCode, String, String)
+
+runScript :: Text -> IO CommandResult
 runScript script = readProcessWithExitCode "/bin/sh" ["-c", unpack script] ""
 
 runBenchmark :: Benchmark -> IO [BenchmarkResult]
 runBenchmark benchmark = do
   outputs <- mapM (\s -> runScript (run s)) steps
   zipped <- return $ zip steps outputs
-  return $ map (\(step, (ret, out, err)) -> BenchmarkResult
+  passed <- return $ isSuccess benchmark outputs
+  return $ map (\(step, (_, out, err)) -> BenchmarkResult
                  { sectionR = section benchmark
                  , descriptionR = description benchmark
                  , runR = run step
-                 , passedR = ret == ExitSuccess
+                 , passedR = passed
                  , outputR = pack out
                  , errorR = pack err
                  , skipR = skip benchmark
                  }) zipped
     where steps = audit benchmark
+
+isSuccess :: Benchmark -> [CommandResult] -> Bool
+isSuccess benchmark outputs =
+  let shouldSkip = isJust $ skip benchmark
+      mode' = fromMaybe All (mode benchmark) in
+    shouldSkip ||
+    case mode' of
+      Any -> any (\(ret, _, _) -> ret == ExitSuccess) outputs
+      All -> all (\(ret, _, _) -> ret == ExitSuccess) outputs
 
 runScan :: IO ()
 runScan = putStrLn "hello"

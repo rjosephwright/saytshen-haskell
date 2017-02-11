@@ -21,6 +21,7 @@ ymlTests =
   [ testCase "Parse the YAML" parseOneBenchmark
   , testCase "Parse more YAML" parseTwoBenchmarks
   , testCase "Run a benchmark" runOneBenchmark
+  , testCase "Run a benchmark that should be skipped" runOneBenchmarkWithSkip
   ]
 
 parseOneBenchmark :: Assertion
@@ -97,3 +98,19 @@ runOneBenchmark =
         } in do
     result <- runBenchmark benchmark
     (map (\res -> (passedR res)) result) @?= ([False] :: [Bool])
+
+runOneBenchmarkWithSkip :: Assertion
+runOneBenchmarkWithSkip =
+  let benchmark = Benchmark
+        { section = "1.1.6"
+        , description = "Ensure separate partition exists for /var"
+        , audit = [
+            AuditStep
+            { run = "mountzz | grep -E '.* on /var type'"
+            , expect = Nothing
+            }
+          ]
+        , mode = Nothing, skip = Just "reasons"
+        } in do
+    result <- runBenchmark benchmark
+    (map (\res -> (passedR res)) result) @?= ([True] :: [Bool])
