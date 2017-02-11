@@ -9,11 +9,9 @@ module Scan
   , BenchmarkResult(..)
   ) where
 
-import qualified Data.ByteString.Char8 as BS
 import Data.Text (Text, pack, unpack)
 import Data.Yaml (FromJSON(..))
 import GHC.Generics
-import GHC.IO.Handle
 import System.Exit
 import System.Process
 
