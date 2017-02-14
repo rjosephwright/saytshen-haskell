@@ -2,6 +2,7 @@
 
 module Scan
   ( runBenchmark
+  , runBenchmarks
   , runScan
   , Mode(..)
   , AuditStep(..)
@@ -77,6 +78,10 @@ runBenchmark benchmark = do
                  }) zipped
     where steps = audit benchmark
 
+runBenchmarks :: [Benchmark] -> IO [BenchmarkResult]
+runBenchmarks benchmarks = do
+  benchmarkResults <- mapM runBenchmark benchmarks
+  return $ concat benchmarkResults
 
 runScan :: IO ()
 runScan = putStrLn "hello"
