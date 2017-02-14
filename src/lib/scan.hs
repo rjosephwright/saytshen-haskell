@@ -52,11 +52,20 @@ type CommandResult = (ExitCode, String, String)
 runScript :: Text -> IO CommandResult
 runScript script = readProcessWithExitCode "/bin/sh" ["-c", unpack script] ""
 
+isSuccess :: Benchmark -> [CommandResult] -> Bool
+isSuccess benchmark outputs =
+  let shouldSkip = isJust $ skip benchmark
+      mode' = fromMaybe All (mode benchmark) in
+    shouldSkip ||
+    case mode' of
+      Any -> any (\(ret, _, _) -> ret == ExitSuccess) outputs
+      All -> all (\(ret, _, _) -> ret == ExitSuccess) outputs
+
 runBenchmark :: Benchmark -> IO [BenchmarkResult]
 runBenchmark benchmark = do
   outputs <- mapM (\s -> runScript (run s)) steps
-  zipped <- return $ zip steps outputs
   passed <- return $ isSuccess benchmark outputs
+  zipped <- return $ zip steps outputs
   return $ map (\(step, (_, out, err)) -> BenchmarkResult
                  { sectionR = section benchmark
                  , descriptionR = description benchmark
@@ -68,14 +77,6 @@ runBenchmark benchmark = do
                  }) zipped
     where steps = audit benchmark
 
-isSuccess :: Benchmark -> [CommandResult] -> Bool
-isSuccess benchmark outputs =
-  let shouldSkip = isJust $ skip benchmark
-      mode' = fromMaybe All (mode benchmark) in
-    shouldSkip ||
-    case mode' of
-      Any -> any (\(ret, _, _) -> ret == ExitSuccess) outputs
-      All -> all (\(ret, _, _) -> ret == ExitSuccess) outputs
 
 runScan :: IO ()
 runScan = putStrLn "hello"
