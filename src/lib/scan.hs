@@ -10,9 +10,13 @@ module Scan
   , BenchmarkResult(..)
   ) where
 
+import Prelude hiding (writeFile)
+import Data.ByteString.Lazy.Char8 (writeFile)
+import Data.ByteString.Lazy (ByteString)
+import Data.Csv (DefaultOrdered, ToField(..), ToNamedRecord, encodeDefaultOrderedByName)
 import Data.Maybe (fromMaybe, isJust)
 import Data.Text (Text, pack, unpack)
-import Data.Yaml (FromJSON(..))
+import Data.Yaml (FromJSON, ParseException, decodeFileEither, prettyPrintParseException)
 import GHC.Generics
 import System.Exit
 import System.Process
@@ -48,6 +52,14 @@ data BenchmarkResult = BenchmarkResult
   , skipR :: Maybe Text
   } deriving (Generic, Show)
 
+instance ToField Bool where
+  toField True = "true"
+  toField False = "false"
+
+instance ToNamedRecord BenchmarkResult
+
+instance DefaultOrdered BenchmarkResult
+
 type CommandResult = (ExitCode, String, String)
 
 runScript :: Text -> IO CommandResult
@@ -56,11 +68,12 @@ runScript script = readProcessWithExitCode "/bin/sh" ["-c", unpack script] ""
 isSuccess :: Benchmark -> [CommandResult] -> Bool
 isSuccess benchmark outputs =
   let shouldSkip = isJust $ skip benchmark
+      exitCodes = map (\(ec, _, _) -> ec) outputs
       check = case (fromMaybe All (mode benchmark)) of
         Any -> any
         All -> all
   in
-    shouldSkip || check (\(ret, _, _) -> ret == ExitSuccess) outputs
+    shouldSkip || check (== ExitSuccess) exitCodes
 
 runBenchmark :: Benchmark -> IO [BenchmarkResult]
 runBenchmark benchmark = do
@@ -83,5 +96,16 @@ runBenchmarks benchmarks = do
   benchmarkResults <- mapM runBenchmark benchmarks
   return $ concat benchmarkResults
 
-runScan :: IO ()
-runScan = putStrLn "hello"
+createReport :: [BenchmarkResult] -> ByteString
+createReport benchmarkResults = encodeDefaultOrderedByName benchmarkResults
+
+runScan :: FilePath -> IO (Either String Bool)
+runScan spec = do
+  benchmarks <- decodeFileEither spec :: IO (Either ParseException [Benchmark])
+  case benchmarks of
+    Right bs -> do
+      benchmarkResults <- runBenchmarks bs
+      report <- return $ createReport benchmarkResults
+      writeFile "report.csv" report
+      return $ Right (all (\br -> passedR br) benchmarkResults)
+    Left err -> return $ Left (prettyPrintParseException err)
