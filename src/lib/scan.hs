@@ -56,11 +56,11 @@ runScript script = readProcessWithExitCode "/bin/sh" ["-c", unpack script] ""
 isSuccess :: Benchmark -> [CommandResult] -> Bool
 isSuccess benchmark outputs =
   let shouldSkip = isJust $ skip benchmark
-      mode' = fromMaybe All (mode benchmark) in
-    shouldSkip ||
-    case mode' of
-      Any -> any (\(ret, _, _) -> ret == ExitSuccess) outputs
-      All -> all (\(ret, _, _) -> ret == ExitSuccess) outputs
+      check = case (fromMaybe All (mode benchmark)) of
+        Any -> any
+        All -> all
+  in
+    shouldSkip || check (\(ret, _, _) -> ret == ExitSuccess) outputs
 
 runBenchmark :: Benchmark -> IO [BenchmarkResult]
 runBenchmark benchmark = do
