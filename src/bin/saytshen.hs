@@ -13,7 +13,7 @@ spec = strOption
 opts :: ParserInfo FilePath
 opts = info (spec <**> helper)
   ( fullDesc
-  <> header "A tool for running security compliance scans"
+    <> header "A tool for running security compliance scans"
   )
 
 main :: IO ()
