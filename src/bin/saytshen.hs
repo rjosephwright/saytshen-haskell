@@ -4,7 +4,8 @@ import           Options.Applicative
 
 spec :: Parser FilePath
 spec = strOption
-  ( long "spec"
+  ( short 's'
+    <> long "spec"
     <> metavar "SPEC"
     <> help "Path to audit specification file"
   )
