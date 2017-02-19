@@ -16,9 +16,8 @@ opts = info (spec <**> helper)
   )
 
 main :: IO ()
-main = do
-  scanResult <- runScan =<< execParser opts
-  case scanResult of
-    (Right b) -> if b then exitSuccess else exitFailure
-    (Left e) -> putStrLn e >> exitWith (ExitFailure 255)
-  return ()
+main = execParser opts >>= runScan >>= exitOn >> return ()
+
+exitOn :: Either String Bool -> IO ()
+exitOn (Left e) = putStrLn e >> exitWith (ExitFailure 255)
+exitOn (Right b) = if b then exitSuccess else exitFailure
