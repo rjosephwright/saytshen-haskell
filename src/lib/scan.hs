@@ -75,21 +75,28 @@ isSuccess benchmark outputs =
   in
     shouldSkip || check (== ExitSuccess) exitCodes
 
+benchmarkResultFrom :: Benchmark -> [AuditStep] -> [CommandResult] -> [BenchmarkResult]
+benchmarkResultFrom benchmark steps outputs =
+  let passed = isSuccess benchmark outputs
+      zipped = zip steps outputs
+  in
+    map (\(step, (_, out, err)) ->
+           BenchmarkResult
+           { sectionR = section benchmark
+           , descriptionR = description benchmark
+           , runR = run step
+           , passedR = passed
+           , outputR = pack out
+           , errorR = pack err
+           , skipR = skip benchmark
+           }) zipped
+
 runBenchmark :: Benchmark -> IO [BenchmarkResult]
-runBenchmark benchmark = do
-  outputs <- mapM (\s -> runScript (run s)) steps
-  passed <- return $ isSuccess benchmark outputs
-  zipped <- return $ zip steps outputs
-  return $ map (\(step, (_, out, err)) -> BenchmarkResult
-                 { sectionR = section benchmark
-                 , descriptionR = description benchmark
-                 , runR = run step
-                 , passedR = passed
-                 , outputR = pack out
-                 , errorR = pack err
-                 , skipR = skip benchmark
-                 }) zipped
-    where steps = audit benchmark
+runBenchmark benchmark =
+  let steps = audit benchmark
+  in do
+    outputs <- mapM (\s -> runScript (run s)) steps
+    return $ benchmarkResultFrom benchmark steps outputs
 
 runBenchmarks :: [Benchmark] -> IO [BenchmarkResult]
 runBenchmarks benchmarks = do
