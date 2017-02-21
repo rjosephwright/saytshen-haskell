@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveGeneric, OverloadedStrings #-}
+{-# LANGUAGE DeriveGeneric, OverloadedStrings, RecordWildCards #-}
 
 module Scan
   ( runBenchmark
@@ -13,9 +13,11 @@ module Scan
 import Prelude hiding (writeFile)
 import Data.ByteString.Lazy.Char8 (writeFile)
 import Data.ByteString.Lazy (ByteString)
-import Data.Csv (DefaultOrdered, ToField(..), ToNamedRecord, encodeDefaultOrderedByName)
+import Data.Csv ((.=))
+import qualified Data.Csv as Csv
 import Data.Maybe (fromMaybe, isJust)
 import Data.Text (Text, pack, unpack)
+import Data.Vector (fromList)
 import Data.Yaml (FromJSON, ParseException, decodeFileEither, prettyPrintParseException)
 import GHC.Generics
 import System.Exit
@@ -54,12 +56,20 @@ data BenchmarkResult = BenchmarkResult
 
 newtype Passed = Passed { unPassed :: Bool } deriving Show
 
-instance ToNamedRecord BenchmarkResult
-instance ToField Passed where
+instance Csv.ToField Passed where
   toField (Passed True) = "true"
   toField (Passed False) = "false"
 
-instance DefaultOrdered BenchmarkResult
+instance Csv.ToNamedRecord BenchmarkResult  where
+  toNamedRecord BenchmarkResult{..} =
+    Csv.namedRecord [ "Section" .= sectionR
+                    , "Description" .= descriptionR
+                    , "Run" .= runR
+                    , "Passed" .= passedR
+                    , "Output" .= outputR
+                    , "Error" .= errorR
+                    , "Skip" .= skipR
+                    ]
 
 type CommandResult = (ExitCode, String, String)
 
@@ -105,7 +115,17 @@ runBenchmarks benchmarks = do
   return $ concat benchmarkResults
 
 createReport :: [BenchmarkResult] -> ByteString
-createReport benchmarkResults = encodeDefaultOrderedByName benchmarkResults
+createReport benchmarkResults =
+  let hdr = fromList [ "Section"
+                     , "Description"
+                     , "Run"
+                     , "Passed"
+                     , "Output"
+                     , "Error"
+                     , "Skip"
+                     ]
+  in
+    Csv.encodeByName hdr benchmarkResults
 
 runScan :: FilePath -> IO (Either String Bool)
 runScan spec = do
