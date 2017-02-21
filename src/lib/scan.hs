@@ -46,17 +46,18 @@ data BenchmarkResult = BenchmarkResult
   { sectionR :: Text
   , descriptionR :: Text
   , runR :: Text
-  , passedR :: Bool
+  , passedR :: Passed
   , outputR :: Text
   , errorR :: Text
   , skipR :: Maybe Text
   } deriving (Generic, Show)
 
-instance ToField Bool where
-  toField True = "true"
-  toField False = "false"
+newtype Passed = Passed { unPassed :: Bool } deriving Show
 
 instance ToNamedRecord BenchmarkResult
+instance ToField Passed where
+  toField (Passed True) = "true"
+  toField (Passed False) = "false"
 
 instance DefaultOrdered BenchmarkResult
 
@@ -85,7 +86,7 @@ benchmarkResultFrom benchmark steps outputs =
            { sectionR = section benchmark
            , descriptionR = description benchmark
            , runR = run step
-           , passedR = passed
+           , passedR = Passed passed
            , outputR = pack out
            , errorR = pack err
            , skipR = skip benchmark
@@ -114,5 +115,5 @@ runScan spec = do
       benchmarkResults <- runBenchmarks bs
       report <- return $ createReport benchmarkResults
       writeFile "report.csv" report
-      return $ Right (all (\br -> passedR br) benchmarkResults)
+      return $ Right (all (\br -> unPassed $ passedR br) benchmarkResults)
     Left err -> return $ Left (prettyPrintParseException err)
