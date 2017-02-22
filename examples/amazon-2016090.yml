@@ -1,0 +1,1574 @@
+# Note: This is a suggested audit specification derived from
+# CIS v2.0.0 for Amazon Linux. This should not be treated as
+# definitive, rather it should be tailored to your local policies.
+
+- section: 1.1.1.1
+  description: Ensure mounting of cramfs filesystems is disabled
+  audit:
+    - run: modprobe -n -v cramfs | grep 'install /bin/true'
+    - run: |
+        lsmod | grep cramfs
+        [ ${?} -eq 1 ]
+
+- section: 1.1.1.2
+  description: Ensure mounting of freevxfs filesystems is disabled
+  audit:
+    - run: modprobe -n -v freevxfs | grep 'install /bin/true'
+    - run: |
+        lsmod | grep freevxfs
+        [ ${?} -eq 1 ]
+
+- section: 1.1.1.3
+  description: Ensure mounting of jffs2 filesystems is disabled
+  audit:
+    - run: modprobe -n -v jffs2 | grep 'install /bin/true'
+    - run: |
+        lsmod | grep jffs2
+        [ ${?} -eq 1 ]
+
+- section: 1.1.1.4
+  description: Ensure mounting of hfs filesystems is disabled
+  audit:
+    - run: modprobe -n -v hfs | grep 'install /bin/true'
+    - run: |
+        lsmod | grep hfs
+        [ ${?} -eq 1 ]
+
+- section: 1.1.1.5
+  description: Ensure mounting of hfsplus filesystems is disabled
+  audit:
+    - run: modprobe -n -v hfsplus | grep 'install /bin/true'
+    - run: |
+        lsmod | grep hfsplus
+        [ ${?} -eq 1 ]
+
+- section: 1.1.1.6
+  description: Ensure mounting of squashfs filesystems is disabled
+  audit:
+    - run: modprobe -n -v squashfs | grep 'install /bin/true'
+    - run: |
+        lsmod | grep squashfs
+        [ ${?} -eq 1 ]
+
+- section: 1.1.1.7
+  description: Ensure mounting of udf filesystems is disabled
+  audit:
+    - run: modprobe -n -v udf | grep 'install /bin/true'
+    - run: |
+        lsmod | grep udf
+        [ ${?} -eq 1 ]
+
+- section: 1.1.1.8
+  description: Ensure mounting of FAT filesystems is disabled
+  audit:
+    - run: modprobe -n -v vfat | grep 'install /bin/true'
+    - run: |
+        lsmod | grep vfat
+        [ ${?} -eq 1 ]
+
+- section: 1.1.2
+  description: Ensure separate partition exists for /tmp
+  audit:
+    - run: mount | grep -E 'tmpfs on /tmp type tmpfs \(([a-z0-9=\-]+)+(,[a-z0-9=\-]+)*\)'
+  skip: Default AMIs in EC2 do not have /tmp partition
+
+- section: 1.1.3
+  description: Ensure nodev option set on /tmp partition
+  audit:
+    - run: mount | grep -E 'tmpfs on /tmp type tmpfs \(([a-z0-9=\-]+,)*nodev(,[a-z0-9=\-]+)*\)'
+  skip: Default AMIs in EC2 do not have /tmp partition
+
+- section: 1.1.4
+  description: Ensure nosuid option set on /tmp partition
+  audit:
+    - run: mount | grep -E 'tmpfs on /tmp type tmpfs \(([a-z0-9=\-]+,)*nosuid(,[a-z0-9=\-]+)*\)'
+  skip: Default AMIs in EC2 do not have /tmp partition
+
+- section: 1.1.5
+  description: Ensure noexec option set on /tmp partition
+  audit:
+    - run: mount | grep -E 'tmpfs on /tmp type tmpfs \(([a-z0-9=\-]+,)*noexec(,[a-z0-9=\-]+)*\)'
+  skip: Default AMIs in EC2 do not have /tmp partition
+
+- section: 1.1.6
+  description: Ensure separate partition exists for /var
+  audit:
+    - run: mount | grep -E '.* on /var type'
+  skip: Default AMIs in EC2 do not have /var partition
+
+- section: 1.1.7
+  description: Ensure separate partition exists for /var/tmp
+  audit:
+    - run: mount | grep -E 'tmpfs on /var/tmp type tmpfs'
+  skip: Default AMIs in EC2 do not have /var/tmp partition
+
+- section: 1.1.8
+  description: Ensure nodev option set on /var/tmp partition
+  audit:
+    - run: mount | grep -E 'tmpfs on /var/tmp type tmpfs'
+  skip: Default AMIs in EC2 do not have /var/tmp partition
+
+- section: 1.1.9
+  description: Ensure nosuid option set on /var/tmp partition
+  audit:
+    - run: mount | grep -E 'tmpfs on /var/tmp type tmpfs'
+  skip: Default AMIs in EC2 do not have /var/tmp partition
+
+- section: 1.1.10
+  description: Ensure noexec option set on /var/tmp partition
+  audit:
+    - run: mount | grep -E 'tmpfs on /var/tmp type tmpfs'
+  skip: Default AMIs in EC2 do not have /var/tmp partition
+
+- section: 1.1.11
+  description: Ensure separate partition exists for /var/log
+  audit:
+    - run: mount | grep -E '.* on /var/log type'
+  skip: Default AMIs in EC2 do not have /var/log partition
+
+- section: 1.1.12
+  description: Ensure separate partition exists for /var/log/audit
+  audit:
+    - run: mount | grep -E '.* on /var/log/audit type'
+  skip: Default AMIs in EC2 do not have /var/log/audit partition
+
+- section: 1.1.13
+  description: Ensure separate partition exists for /home
+  audit:
+    - run: mount | grep -E '.* on /home type'
+  skip: Default AMIs in EC2 do not have /home partition
+
+- section: 1.1.14
+  description: Ensure nodev option set on /home partition
+  audit:
+    - run: mount | grep -E '.* on /home type .* \(([a-z0-9=]+,)*nodev(,[a-z0-9=]+)*\)'
+  skip: Default AMIs in EC2 do not have /home partition
+
+- section: 1.1.15
+  description: Ensure nodev option set on /dev/shm partition
+  audit:
+    - run: mount | grep -E 'tmpfs on /dev/shm type tmpfs \(([a-z0-9=\-]+,)*nodev(,[a-z0-9=\-]+)*\)'
+
+- section: 1.1.16
+  description: Ensure nosuid option set on /dev/shm partition
+  audit:
+    - run: mount | grep -E 'tmpfs on /dev/shm type tmpfs \(([a-z0-9=\-]+,)*nosuid(,[a-z0-9=\-]+)*\)'
+
+- section: 1.1.17
+  description: Ensure noexec option set on /dev/shm partition
+  audit:
+    - run: mount | grep -E 'tmpfs on /dev/shm type tmpfs \(([a-z0-9=\-]+,)*noexec(,[a-z0-9=\-]+)*\)'
+
+- section: 1.1.18
+  description: Ensure sticky bit is set on all world-writable directories
+  audit:
+    - run: df --local -P | awk {'if (NR!=1) print $6'} | xargs -I '{}' find '{}' -xdev -type d \( -perm -0002 -a ! -perm -1000 \) 2>/dev/null
+
+- section: 1.1.19
+  description: Disable Automounting
+  audit:
+    - run: |
+        out=`chkconfig --list autofs | grep -E '\d:on'`
+        [ -z "${out}" ]
+
+- section: 1.2.1
+  description: Ensure package manager repositories are configured
+  audit:
+    - run: yum repolist | grep -E 'amzn-(main|updates)/latest'
+
+- section: 1.2.2
+  description: Ensure GPG keys are configured
+  audit:
+    - run: |
+        out=`rpm -q gpg-pubkey --qf '%{name}-%{version}-%{release} --> %{summary}\n'`
+        echo ${out} | grep -E 'gpg-pubkey-21c0f39f.*Amazon Linux AMI'
+
+- section: 1.2.3
+  description: Ensure gpgcheck is globally activated
+  audit:
+    - run: grep '^gpgcheck=1' /etc/yum.conf
+
+- section: 1.3.1
+  description: Ensure AIDE is installed
+  audit:
+    - run: rpm -q aide
+
+- section: 1.3.2
+  description: Ensure filesystem integrity is regularly checked
+  audit:
+    - run: crontab -u root -l | grep aide
+    - run: grep -r aide /etc/cron.* /etc/crontab
+
+- section: 1.4.1
+  description: Ensure permissions on bootloader config are configured
+  audit:
+    - run: |
+        mode=`stat --printf '%a' /boot/grub2/menu.lst`
+        [ "${mode}" = "600" ]
+
+- section: 1.4.2
+  description: Ensure authentication required for single user mode
+  audit:
+    - run: grep -E '^SINGLE=/sbin/sulogin$' /etc/sysconfig/init
+
+- section: 1.4.3
+  description: Ensure interactive boot is not enabled
+  audit:
+    - run: grep -E '^PROMPT=no$' /etc/sysconfig/init
+
+- section: 1.5.1
+  description: Ensure core dumps are restricted
+  audit:
+    - run: grep -E '\* hard core 0' /etc/security/limits.conf /etc/security/limits.d/*
+    - run: |
+        out=`sysctl fs.suid_dumpable | awk '{print $3}'`
+        [ "${out}" = "0" ]
+
+- section: 1.5.2
+  description: Ensure XD/NX support is enabled
+  audit:
+    - run: |
+        dmesg | grep 'NX \(Execute Disable\) protection: active'
+
+- section: 1.5.3
+  description: Ensure address space layout randomization (ASLR) is enabled
+  audit:
+    - run: |
+        out=`sysctl kernel.randomize_va_space | awk '{print $3}'`
+        [ "${out}" = "2" ]
+
+- section: 1.5.4
+  description: Ensure prelink is disabled
+  audit:
+    - run: rpm -q prelink | grep 'package prelink is not installed'
+
+- section: 1.6.1.1
+  description: Ensure SELinux is not disabled in bootloader configuration
+  audit:
+    - run: grep "^\s*kernel" /boot/grub/menu.lst | grep -E "(selinux|enforcing)=0" && false
+
+- section: 1.6.1.2
+  description: Ensure the SELinux state is enforcing
+  audit:
+    - run: grep SELINUX=enforcing /etc/selinux/config
+
+- section: 1.6.1.3
+  description: Ensure SELinux policy is configured
+  audit:
+    - run: grep SELINUXTYPE=targeted /etc/selinux/config
+
+- section: 1.6.1.4
+  description: Ensure SETroubleshoot is not installed
+  audit:
+    - run: rpm -q setroubleshoot | grep 'package setroubleshoot is not installed'
+
+- section: 1.6.1.5
+  description: Ensure the MCS Translation Service (mcstrans) is not installed
+  audit:
+    - run: rpm -q mcstrans | grep 'package mcstrans is not installed'
+
+- section: 1.6.1.6
+  description: Ensure no unconfined daemons exist
+  audit:
+    - run: ps -eZ | egrep "initrc" | egrep -vw "tr|ps|egrep|bash|awk" | tr ':' ' ' | awk '{print $NF}'
+
+- section: 1.6.2
+  description: Ensure SELinux is installed
+  audit:
+    - run: rpm -q libselinux
+
+- section: 1.7.1.1
+  description: Ensure message of the day is configured properly
+  audit:
+    - run: |
+        egrep '(\\v|\\r|\\m|\\s)' /etc/motd
+        [ ${?} -ne 0 ]
+
+- section: 1.7.1.2
+  description: Ensure local login warning banner is configured properly
+  audit:
+    - run: |
+        egrep '(\\v|\\r|\\m|\\s)' /etc/issue
+        [ ${?} -ne 0 ]
+
+- section: 1.7.1.3
+  description: Ensure remote login warning banner is configured properly
+  audit:
+    - run: |
+        egrep '(\\v|\\r|\\m|\\s)' /etc/issue.net
+        [ ${?} -ne 0 ]
+
+- section: 1.7.1.4
+  description: Ensure permissions on /etc/motd are configured
+  audit:
+    - run: |
+        mode=`stat --printf '%a' /etc/motd`
+        [ "${mode}" = "644" ]
+
+- section: 1.7.1.5
+  description: Ensure permissions on /etc/issue are configured
+  audit:
+    - run: |
+        mode=`stat --printf '%a' /etc/issue`
+        [ "${mode}" = "644" ]
+
+- section: 1.7.1.6
+  description: Ensure permissions on /etc/issue.net are configured
+  audit:
+    - run: |
+        mode=`stat --printf '%a' /etc/issue.net`
+        [ "${mode}" = "644" ]
+
+- section: '1.8'
+  description: Ensure updates, patches, and additional security software are installed
+  audit:
+    - run: yum check-update
+
+- section: 2.1.1
+  description: Ensure chargen services are not enabled
+  audit:
+    - run: |
+        out=`chkconfig --list | grep -E 'chargen-(dgram|stream):\s+on'`
+        [ -z "${out}" ]
+
+- section: 2.1.2
+  description: Ensure daytime services are not enabled
+  audit:
+    - run: |
+        out=`chkconfig --list | grep -E 'daytime-(dgram|stream):\s+on'`
+        [ -z "${out}" ]
+
+- section: 2.1.3
+  description: Ensure discard services are not enabled
+  audit:
+    - run: |
+        out=`chkconfig --list | grep -E 'discard-(dgram|stream):\s+on'`
+        [ -z "${out}" ]
+
+- section: 2.1.4
+  description: Ensure echo services are not enabled
+  audit:
+    - run: |
+        out=`chkconfig --list | grep -E 'echo-(dgram|stream):\s+on'`
+        [ -z "${out}" ]
+
+- section: 2.1.5
+  description: Ensure time services are not enabled
+  audit:
+    - run: |
+        out=`chkconfig --list | grep -E 'time-(dgram|stream):\s+on'`
+        [ -z "${out}" ]
+
+- section: 2.1.6
+  description: Ensure rsh server is not enabled
+  audit:
+    - run: |
+        out=`chkconfig --list | grep -E '(rexec|rlogin|rsh):\s+on'`
+        [ -z "${out}" ]
+
+- section: 2.1.7
+  description: Ensure talk server is not enabled
+  audit:
+    - run: |
+        out=`chkconfig --list | grep -E 'talk:\s+on'`
+        [ -z "${out}" ]
+
+- section: 2.1.8
+  description: Ensure telnet server is not enabled
+  audit:
+    - run: |
+        out=`chkconfig --list | grep -E 'telnet:\s+on'`
+        [ -z "${out}" ]
+
+- section: 2.1.9
+  description: Ensure tftp server is not enabled
+  audit:
+    - run: |
+        out=`chkconfig --list | grep -E 'tftp:\s+on'`
+        [ -z "${out}" ]
+
+- section: 2.1.10
+  description: Ensure rsync service is not enabled
+  audit:
+    - run: |
+        out=`chkconfig --list | grep -E 'rsync:\s+on'`
+        [ -z "${out}" ]
+
+- section: 2.1.11
+  description: Ensure xinetd is not enabled
+  audit:
+    - run: |
+        out=`chkconfig --list | grep -E 'xinetd (\s+[0-6]:off)*(\s+[0-6]:on)+'`
+        [ -z "${out}" ]
+
+- section: 2.2.1.1
+  description: Ensure time synchronization is in use
+  audit:
+    - run: rpm -q ntp
+    - run: rpm -q chrony
+  mode: Any
+
+- section: 2.2.1.2
+  description: Ensure ntp is configured
+  audit:
+    - run: grep -E '^restrict -4 default kod nomodify notrap nopeer noquery' /etc/ntp.conf
+    - run: grep -E '^restrict -6 default kod nomodify notrap nopeer noquery' /etc/ntp.conf
+    - run: grep -E '^server\s+\d+\.\d+\.\d+\.\d+' /etc/ntp.conf
+
+- section: 2.2.1.3
+  description: Ensure chrony is configured
+  audit:
+    - run: grep -E '^server \d+\.\d+\.\d+\.\d+' /etc/chrony.conf
+    - run: grep -E '^OPTIONS="-u chrony"' /etc/sysconfig/chronyd
+
+- section: 2.2.2
+  description: Ensure X Window System is not installed
+  audit:
+    - run: |
+        out=`rpm -qa xorg-x11*`
+        [ -z "${out}" ]
+
+- section: 2.2.3
+  description: Ensure Avahi Server is not enabled
+  audit:
+    - run: |
+        out=`chkconfig --list | grep -E 'avahi-daemon (\s+[0-6]:off)*(\s+[0-6]:on)+'`
+        [ -z "${out}" ]
+
+- section: 2.2.4
+  description: Ensure CUPS is not enabled
+  audit:
+    - run: |
+        out=`chkconfig --list cups | grep -E '\d:on'
+        [ -z "${out}" ]
+
+- section: 2.2.5
+  description: Ensure DHCP server is not enabled
+  audit:
+    - run: |
+        out=`chkconfig --list dhcpd | grep -E '\d:on'
+        [ -z "${out}" ]
+
+- section: 2.2.6
+  description: Ensure LDAP server is not enabled
+  audit:
+    - run: |
+        out=`chkconfig --list slapd | grep -E '\d:on'
+        [ -z "${out}" ]
+
+- section: 2.2.7
+  description: Ensure NFS and RPC are not enabled
+  audit:
+    - run: |
+        out=`chkconfig --list nfs | grep -E '\d:on'
+        [ -z "${out}" ]
+    - run: |
+        out=`chkconfig --list rpcbind | grep -E '\d:on'
+        [ -z "${out}" ]
+
+- section: 2.2.8
+  description: Ensure DNS server is not enabled
+  audit:
+    - run: |
+        out=`chkconfig --list named | grep -E '\d:on'
+        [ -z "${out}" ]
+
+- section: 2.2.9
+  description: Ensure FTP server is not enabled
+  audit:
+    - run: |
+        out=`chkconfig --list vsftpd | grep -E '\d:on'
+        [ -z "${out}" ]
+
+- section: 2.2.10
+  description: Ensure HTTP server is not enabled
+  audit:
+    - run: |
+        out=`chkconfig --list httpd | grep -E '\d:on'
+        [ -z "${out}" ]
+
+- section: 2.2.11
+  description: Ensure IMAP and POP3 server is not enabled
+  audit:
+    - run: |
+        out=`chkconfig --list dovecot | grep -E '\d:on'
+        [ -z "${out}" ]
+
+- section: 2.2.12
+  description: Ensure Samba is not enabled
+  audit:
+    - run: |
+        out=`chkconfig --list smb | grep -E '\d:on'
+        [ -z "${out}" ]
+
+- section: 2.2.13
+  description: Ensure HTTP Proxy Server is not enabled
+  audit:
+    - run: |
+        out=`chkconfig --list squid | grep -E '\d:on'
+        [ -z "${out}" ]
+
+- section: 2.2.14
+  description: Ensure SNMP Server is not enabled
+  audit:
+    - run: |
+        out=`chkconfig --list snmpd | grep -E '\d:on'
+        [ -z "${out}" ]
+
+- section: 2.2.15
+  description: Ensure mail transfer agent is configured for local-only mode
+  audit:
+    - run: netstat -an | grep -E 'tcp\s+0\s+0\s+127.0.0.1:25\s+0.0.0.0:\*\s+LISTEN'
+
+- section: 2.2.16
+  description: Ensure NIS Server is not enabled
+  audit:
+    - run: |
+        out=`chkconfig --list ypserv | grep -E '\d:on'
+        [ -z "${out}" ]
+
+- section: 2.3.1
+  description: Ensure NIS Client is not installed
+  audit:
+    - run: |
+        out=`rpm -q ypbind`
+        echo ${out} | grep 'package ypbind is not installed'
+
+- section: 2.3.2
+  description: Ensure rsh client is not installed
+  audit:
+    - run: |
+        out=`rpm -q rsh`
+        echo ${out} | grep 'package rsh is not installed'
+
+- section: 2.3.3
+  description: Ensure talk client is not installed
+  audit:
+    - run: |
+        out=`rpm -q talk`
+        echo ${out} | grep 'package talk is not installed'
+
+- section: 2.3.4
+  description: Ensure telnet client is not installed
+  audit:
+    - run: |
+        out=`rpm -q telnet`
+        echo ${out} | grep 'package telnet is not installed'
+
+- section: 2.3.5
+  description: Ensure LDAP client is not installed
+  audit:
+    - run: |
+        out=`rpm -q openldap-clients`
+        echo ${out} | grep 'package openldap-clients is not installed'
+
+- section: 3.1.1
+  description: Ensure IP forwarding is disabled
+  audit:
+    - run: |
+        out=`sysctl net.ipv4.ip_forward | awk '{print $3}'`
+        [ "${out}" = "0" ]
+
+- section: 3.1.2
+  description: Ensure packet redirect sending is disabled
+  audit:
+    - run: |
+        out=`sysctl net.ipv4.conf.all.send_redirects | awk '{print $3}'`
+        [ "${out}" = "0" ]
+    - run: |
+        out=`sysctl net.ipv4.conf.default.send_redirects | awk '{print $3}'`
+        [ "${out}" = "0" ]
+
+- section: 3.2.1
+  description: Ensure source routed packets are not accepted
+  audit:
+    - run: |
+        out=`sysctl net.ipv4.conf.all.accept_source_route | awk '{print $3}'`
+        [ "${out}" = "0" ]
+    - run: |
+        out=`sysctl net.ipv4.conf.default.accept_source_route | awk '{print $3}'`
+        [ "${out}" = "0" ]
+
+- section: 3.2.2
+  description: Ensure ICMP redirects are not accepted
+  audit:
+    - run: |
+        out=`sysctl net.ipv4.conf.all.accept_redirects | awk '{print $3}'`
+        [ "${out}" = "0" ]
+    - run: |
+        out=`sysctl net.ipv4.conf.default.accept_redirects | awk '{print $3}'`
+        [ "${out}" = "0" ]
+
+- section: 3.2.3
+  description: Ensure secure ICMP redirects are not accepted
+  audit:
+    - run: |
+        out=`sysctl net.ipv4.conf.all.secure_redirects | awk '{print $3}'`
+        [ "${out}" = "0" ]
+    - run: |
+        out=`sysctl net.ipv4.conf.default.secure_redirects | awk '{print $3}'`
+        [ "${out}" = "0" ]
+
+- section: 3.2.4
+  description: Ensure suspicious packets are logged
+  audit:
+    - run: |
+        out=`sysctl net.ipv4.conf.all.log_martians | awk '{print $3}'`
+        [ "${out}" = "1" ]
+    - run: |
+        out=`sysctl net.ipv4.conf.default.log_martians | awk '{print $3}'`
+        [ "${out}" = "1" ]
+
+- section: 3.2.5
+  description: Ensure broadcast ICMP requests are ignored
+  audit:
+    - run: |
+        out=`sysctl net.ipv4.icmp_echo_ignore_broadcasts | awk '{print $3}'`
+        [ "${out}" = "1" ]
+
+- section: 3.2.6
+  description: Ensure bogus ICMP responses are ignored
+  audit:
+    - run: |
+        out=`sysctl net.ipv4.icmp_ignore_bogus_error_responses | awk '{print $3}'`
+        [ "${out}" = "1" ]
+
+- section: 3.2.7
+  description: Ensure Reverse Path Filtering is enabled
+  audit:
+    - run: |
+        out=`sysctl net.ipv4.conf.all.rp_filter | awk '{print $3}'`
+        [ "${out}" = "1" ]
+    - run: |
+        out=`sysctl net.ipv4.conf.default.rp_filter | awk '{print $3}'`
+        [ "${out}" = "1" ]
+
+- section: 3.2.8
+  description: Ensure TCP SYN Cookies is enabled
+  audit:
+    - run: |
+        out=`sysctl net.ipv4.tcp_syncookies | awk '{print $3}'`
+        [ "${out}" = "1" ]
+
+- section: 3.3.1
+  description: Ensure IPv6 router advertisements are not accepted
+  audit:
+    - run: |
+        out=`sysctl net.ipv6.conf.all.accept_ra | awk '{print $3}'`
+        [ "${out}" = "0" ]
+    - run: |
+        out=`sysctl net.ipv6.conf.default.accept_ra | awk '{print $3}'`
+        [ "${out}" = "0" ]
+  skip: IPv6 is disabled
+
+- section: 3.3.2
+  description: Ensure IPv6 redirects are not accepted
+  audit:
+    - run: |
+        out=`sysctl net.ipv6.conf.all.accept_redirects | awk '{print $3}'`
+        [ "${out}" = "0" ]
+    - run: |
+        out=`sysctl net.ipv6.conf.default.accept_redirects | awk '{print $3}'`
+        [ "${out}" = "0" ]
+  skip: IPv6 is disabled
+
+- section: 3.3.3
+  description: Ensure IPv6 is disabled
+  audit:
+    - run: modprobe -c | grep 'options ipv6 disable=1'
+
+- section: 3.4.1
+  description: Ensure TCP Wrappers is installed
+  audit:
+    - run: rpm -q tcp_wrappers
+    - run: rpm -q tcp_wrappers-libs
+
+- section: 3.4.2
+  description: Ensure /etc/hosts.allow is configured
+  audit:
+    - run: |
+        ranges="10. 172.16.0.0/255.240.0.0 192.168."
+        ret=0
+        for r in ${ranges}; do
+            grep -E "ALL\s*:\s+${r}" /etc/hosts.allow || ret=1
+        done
+        exit ${ret}
+
+- section: 3.4.3
+  description: Ensure /etc/hosts.deny is configured
+  audit:
+    - run: grep -E 'ALL\s*:\s+ALL' /etc/hosts.deny
+
+- section: 3.4.4
+  description: Ensure permissions on /etc/hosts.allow are configured
+  audit:
+    - run: |
+        mode=`stat --printf '%a' /etc/hosts.allow`
+        [ "${mode}" = "644" ]
+
+- section: 3.4.5
+  description: Ensure permissions on /etc/hosts.deny are configured
+  audit:
+    - run: |
+        mode=`stat --printf '%a' /etc/hosts.deny`
+        [ "${mode}" = "644" ]
+
+- section: 3.5.1
+  description: Ensure DCCP is disabled
+  audit:
+    - run: modprobe -n -v dccp | grep 'install /bin/true'
+
+- section: 3.5.2
+  description: Ensure SCTP is disabled
+  audit:
+    - run: modprobe -n -v sctp | grep 'install /bin/true'
+
+- section: 3.5.3
+  description: Ensure RDS is disabled
+  audit:
+    - run: modprobe -n -v rds | grep 'install /bin/true'
+
+- section: 3.5.4
+  description: Ensure TIPC is disabled
+  audit:
+    - run: modprobe -n -v tipc | grep 'install /bin/true'
+
+- section: 3.6.1
+  description: Ensure iptables is installed
+  audit:
+    - run: rpm -q iptables
+
+- section: 3.6.2
+  description: Ensure default deny firewall policy
+  audit:
+    - run: iptables -L | grep -E 'Chain INPUT \(policy DROP\)'
+    - run: iptables -L | grep -E 'Chain FORWARD \(policy DROP\)'
+    - run: iptables -L | grep -E 'Chain OUTPUT \(policy DROP\)'
+
+- section: 3.6.3
+  description: Ensure loopback traffic is configured
+  audit:
+    - run: iptables -L INPUT -v -n | grep -E '0\s+0\s+ACCEPT\s+all\s+--\s+lo\s+\*\s+0.0.0.0/0\s+0.0.0.0/0'
+    - run: iptables -L INPUT -v -n | grep -E '0\s+0\s+DROP\s+all\s+--\s+\*\s+\*\s+127.0.0.0/8\s+0.0.0.0/0'
+    - run: iptables -L OUTPUT -v -n | grep -E '0\s+0\s+ACCEPT\s+all\s+--\s+\*\s+lo\s+0.0.0.0/0\s+0.0.0.0/0'
+
+- section: 3.6.4
+  description: Ensure outbound and established connections are configured
+  audit:
+    - run: iptables -L -v -n
+
+- section: 3.6.5
+  description: Ensure firewall rules exist for all open ports
+  audit:
+    - run: |
+        ports=`netstat -ln | awk '$4~/0.0.0.0:([1-9]+)/{print $4}' | cut -d : -f 2`
+        for port in ports; do
+            iptables -L INPUT -v -n | grep "tcp dpt:${port}"
+        done
+
+- section: 4.1.1.1
+  description: Ensure audit log storage size is configured
+  audit:
+    - run: grep -E '^max_log_file\s*=\s*\d+$' /etc/audit/auditd.conf
+
+- section: 4.1.1.2
+  description: Ensure system is disabled when audit logs are full
+  audit:
+    - run: grep -E '^space_left_action\s*=\s*email$' /etc/audit/auditd.conf
+    - run: grep -E '^action_mail_acct\s*=\s*root' /etc/audit/auditd.conf
+    - run: grep -E '^admin_space_left_action\s*=\s*halt' /etc/audit/auditd.conf
+
+- section: 4.1.1.3
+  description: Ensure audit logs are not automatically deleted
+  audit:
+    - run: grep -E '^max_log_file_action\s*=\s*keep_logs' /etc/audit/auditd.conf
+
+- section: 4.1.2
+  description: Ensure auditd service is enabled
+  audit:
+    - run: chkconfig --list auditd | grep -E '2:on\s+3:on\s+4:on\s+5:on'
+
+- section: 4.1.3
+  description: Ensure auditing for processes that start prior to auditd is enabled
+  audit:
+    - run: grep "^\s*kernel.*audit=1" /boot/grub/menu.lst
+
+- section: 4.1.4
+  description: Ensure events that modify date and time information are collected
+  audit:
+    - run: grep -- '-a always,exit -F arch=b64 -S adjtimex -S settimeofday -k time-change' /etc/audit/audit.rules
+    - run: grep -- '-a always,exit -F arch=b32 -S adjtimex -S settimeofday -S stime -k time-change' /etc/audit/audit.rules
+    - run: grep -- '-a always,exit -F arch=b64 -S clock_settime -k time-change' /etc/audit/audit.rules
+    - run: grep -- '-a always,exit -F arch=b32 -S clock_settime -k time-change' /etc/audit/audit.rules
+    - run: grep -- '-w /etc/localtime -p wa -k time-change' /etc/audit/audit.rules
+
+- section: 4.1.5
+  description: Ensure events that modify user/group information are collected
+  audit:
+    - run: grep -- '-w /etc/group -p wa -k identity' /etc/audit/audit.rules
+    - run: grep -- '-w /etc/passwd -p wa -k identity' /etc/audit/audit.rules
+    - run: grep -- '-w /etc/gshadow -p wa -k identity' /etc/audit/audit.rules
+    - run: grep -- '-w /etc/shadow -p wa -k identity' /etc/audit/audit.rules
+    - run: grep -- '-w /etc/security/opasswd -p wa -k identity' /etc/audit/audit.rules
+
+- section: 4.1.6
+  description: Ensure events that modify user/group information are collected
+  audit:
+    - run: grep -- '-a always,exit -F arch=b64 -S sethostname -S setdomainname -k system-locale' /etc/audit/audit.rules
+    - run: grep -- '-a always,exit -F arch=b32 -S sethostname -S setdomainname -k system-locale' /etc/audit/audit.rules
+    - run: grep -- '-w /etc/issue -p wa -k system-locale' /etc/audit/audit.rules
+    - run: grep -- '-w /etc/issue.net -p wa -k system-locale' /etc/audit/audit.rules
+    - run: grep -- '-w /etc/hosts -p wa -k system-locale' /etc/audit/audit.rules
+    - run: grep -- '-w /etc/sysconfig/network -p wa -k system-locale' /etc/audit/audit.rules
+
+- section: 4.1.7
+  description: "Ensure events that modify the system's Mandatory Access Controls are collected"
+  audit:
+    - run: grep -- '-w /etc/selinux/ -p wa -k MAC-policy' /etc/audit/audit.rules
+
+- section: 4.1.8
+  description: Ensure login and logout events are collected
+  audit:
+    - run: grep -- '-w /var/log/lastlog -p wa -k logins' /etc/audit/audit.rules
+    - run: grep -- '-w /var/run/faillock/ -p wa -k logins' /etc/audit/audit.rules
+
+- section: 4.1.9
+  description: Ensure session initiation information is collected
+  audit:
+    - run: grep -- '-w /var/run/utmp -p wa -k session' /etc/audit/audit.rules
+    - run: grep -- '-w /var/log/wtmp -p wa -k session' /etc/audit/audit.rules
+    - run: grep -- '-w /var/log/btmp -p wa -k session' /etc/audit/audit.rules
+
+- section: 4.1.10
+  description: Ensure session initiation information is collected
+  audit:
+    - run: grep -- '-a always,exit -F arch=b64 -S chmod -S fchmod -S fchmodat -F auid>=500 -F auid!=4294967295 -k perm_mod' /etc/audit/audit.rules
+    - run: grep -- '-a always,exit -F arch=b32 -S chmod -S fchmod -S fchmodat -F auid>=500 -F auid!=4294967295 -k perm_mod' /etc/audit/audit.rules
+    - run: grep -- '-a always,exit -F arch=b64 -S chown -S fchown -S fchownat -S lchown -F auid>=500 -F auid!=4294967295 -k perm_mod' /etc/audit/audit.rules
+    - run: grep -- '-a always,exit -F arch=b32 -S chown -S fchown -S fchownat -S lchown -F auid>=500 -F auid!=4294967295 -k perm_mod' /etc/audit/audit.rules
+
+- section: 4.1.11
+  description: Ensure unsuccessful unauthorized file access attempts are collected
+  audit:
+    - run: grep -- '-a always,exit -F arch=b64 -S creat -S open -S openat -S truncate -S ftruncate -F exit=-EACCES -F auid>=500 -F auid!=4294967295 -k access' /etc/audit/audit.rules
+    - run: grep -- '-a always,exit -F arch=b32 -S creat -S open -S openat -S truncate -S ftruncate -F exit=-EACCES -F auid>=500 -F auid!=4294967295 -k access' /etc/audit/audit.rules
+    - run: grep -- '-a always,exit -F arch=b64 -S creat -S open -S openat -S truncate -S ftruncate -F exit=-EPERM -F auid>=500 -F auid!=4294967295 -k access' /etc/audit/audit.rules
+    - run: grep -- '-a always,exit -F arch=b32 -S creat -S open -S openat -S truncate -S ftruncate -F exit=-EPERM -F auid>=500 -F auid!=4294967295 -k access' /etc/audit/audit.rules
+
+# - section: 4.1.12
+#   description: Ensure use of privileged commands is collected
+#   audit:
+#     - run: |
+#        ret=0
+#        priv_commands=`find / -xdev \( -perm -4000 -o -perm -2000 \) -type f`
+#        for command in ${priv_commands}; do
+#            grep -- "-a always,exit -F path=${command} -F perm=x -F auid>=500 -F auid!=4294967295 -k privileged" /etc/audit/audit.rules || ret=1
+#        done
+#        exit ${ret}
+
+- section: 4.1.13
+  description: Ensure successful file system mounts are collected
+  audit:
+    - run: grep -- '-a always,exit -F arch=b64 -S mount -F auid>=500 -F auid!=4294967295 -k mounts' /etc/audit/audit.rules
+    - run: grep -- '-a always,exit -F arch=b32 -S mount -F auid>=500 -F auid!=4294967295 -k mounts' /etc/audit/audit.rules
+
+- section: 4.1.14
+  description: Ensure file deletion events by users are collected
+  audit:
+    - run: grep -- '-a always,exit -F arch=b64 -S unlink -S unlinkat -S rename -S renameat -F auid>=500 -F auid!=4294967295 -k delete' /etc/audit/audit.rules
+    - run: grep -- '-a always,exit -F arch=b32 -S unlink -S unlinkat -S rename -S renameat -F auid>=500 -F auid!=4294967295 -k delete' /etc/audit/audit.rules
+
+- section: 4.1.15
+  description: Ensure changes to system administration scope (sudoers) is collected
+  audit:
+    - run: grep -- '-w /etc/sudoers -p wa -k scope' /etc/audit/audit.rules
+    - run: grep -- '-w /etc/sudoers.d -p wa -k scope' /etc/audit/audit.rules
+
+- section: 4.1.16
+  description: Ensure system administrator actions (sudolog) are collected
+  audit:
+    - run: grep -- '-w /var/log/sudo.log -p wa -k actions' /etc/audit/audit.rules
+
+- section: 4.1.17
+  description: Ensure kernel module loading and unloading is collected
+  audit:
+    - run: grep -- '-w /sbin/insmod -p x -k modules' /etc/audit/audit.rules
+    - run: grep -- '-w /sbin/rmmod -p x -k modules' /etc/audit/audit.rules
+    - run: grep -- '-w /sbin/modprobe -p x -k modules' /etc/audit/audit.rules
+    - run: grep -- '-a always,exit -F arch=b64 -S init_module -S delete_module -k modules' /etc/audit/audit.rules
+
+- section: 4.1.18
+  description: Ensure the audit configuration is immutable
+  audit:
+    - run: |
+        out=`grep "^\s*[^#]" /etc/audit/audit.rules | tail -1`
+        [ "${out}" = "-e 2" ]
+
+- section: 4.2.1.1
+  description: Ensure rsyslog Service is enabled
+  audit:
+    - run: chkconfig --list rsyslog | grep -E '2:on\s+3:on\s+4:on\s+5:on'
+
+- section: 4.2.1.2
+  description: Ensure logging is configured
+  audit:
+    - run: grep -E '\*\.info;mail\.none;authpriv\.none;cron\.none\s+/var/log/messages' /etc/rsyslog.conf
+    - run: grep -E 'authpriv\.\*\s+/var/log/secure' /etc/rsyslog.conf
+    - run: grep -E 'mail\.\*\s+-/var/log/maillog' /etc/rsyslog.conf
+    - run: grep -E 'cron\.\*\s+/var/log/cron' /etc/rsyslog.conf
+    - run: grep -E '\*\.emerg\s+:omusrmsg:\*' /etc/rsyslog.conf
+    - run: grep -E 'uucp,news\.crit\s+/var/log/spooler' /etc/rsyslog.conf
+    - run: grep -E 'local7\.\*\s+/var/log/boot.log' /etc/rsyslog.conf
+
+- section: 4.2.1.3
+  description: Ensure rsyslog default file permissions configured
+  audit:
+    - run: grep -E '^\$FileCreateMode\s+0640' /etc/rsyslog.conf
+
+- section: 4.2.1.4
+  description: Ensure rsyslog is configured to send logs to a remote log host
+  audit:
+    - run: grep "^*.*[^I][^I]*@" /etc/rsyslog.conf
+
+- section: 4.2.1.5
+  description: Ensure remote rsyslog messages are only accepted on designated log hosts
+  audit:
+    - run: |
+        out=`grep -E '$ModLoad\s+imtcp.so' /etc/rsyslog.conf`
+        [ -z "${out}" ]
+    - run: |
+        out=`grep -E '$InputTCPServerRun' /etc/rsyslog.conf`
+        [ -z "${out}" ]
+
+- section: 4.2.3
+  description: Ensure rsyslog or syslog-ng is installed
+  audit:
+    - run: rpm -q rsyslog
+    - run: rpm -q syslog-ng
+  mode: Any
+
+- section: 4.2.4
+  description: Ensure permissions on all logfiles are configured
+  audit:
+    - run: |
+        out=`find /var/log -type f -perm /o=rwx`
+        [ -z "${out}" ]
+    - run: |
+        out=`find /var/log -type f -perm /g=wx`
+        [ -z "${out}" ]
+
+- section: '4.3'
+  description: Ensure logrotate is configured
+  audit:
+    - run: grep /var/log/cron /etc/logrotate.d/syslog
+    - run: grep /var/log/maillog /etc/logrotate.d/syslog
+    - run: grep /var/log/messages /etc/logrotate.d/syslog
+    - run: grep /var/log/secure /etc/logrotate.d/syslog
+    - run: grep /var/log/spooler /etc/logrotate.d/syslog
+
+- section: 5.1.1
+  description: Ensure cron daemon is enabled
+  audit:
+    - run: chkconfig --list crond | grep -E '2:on\s+3:on\s+4:on\s+5:on'
+
+- section: 5.1.2
+  description: Ensure permissions on /etc/crontab are configured
+  audit:
+    - run: |
+        mode=`stat --printf '%a' /etc/crontab`
+        [ "${mode}" = "600" ]
+
+- section: 5.1.3
+  description: Ensure permissions on /etc/cron.hourly are configured
+  audit:
+    - run: |
+        mode=`stat --printf '%a' /etc/cron.hourly`
+        [ "${mode}" = "700" ]
+
+- section: 5.1.4
+  description: Ensure permissions on /etc/cron.daily are configured
+  audit:
+    - run: |
+        mode=`stat --printf '%a' /etc/cron.daily`
+        [ "${mode}" = "700" ]
+
+- section: 5.1.5
+  description: Ensure permissions on /etc/cron.weekly are configured
+  audit:
+    - run: |
+        mode=`stat --printf '%a' /etc/cron.weekly`
+        [ "${mode}" = "700" ]
+
+- section: 5.1.6
+  description: Ensure permissions on /etc/cron.monthly are configured
+  audit:
+    - run: |
+        mode=`stat --printf '%a' /etc/cron.monthly`
+        [ "${mode}" = "700" ]
+
+- section: 5.1.7
+  description: Ensure permissions on /etc/cron.d are configured
+  audit:
+    - run: |
+        mode=`stat --printf '%a' /etc/cron.d`
+        [ "${mode}" = "700" ]
+
+- section: 5.1.8
+  description: Ensure at/cron is restricted to authorized users
+  audit:
+    - run: '[ ! -f /etc/at.deny ]'
+    - run: '[ ! -f /etc/cron.deny ]'
+    - run: |
+        mode=`stat --printf '%a' /etc/at.allow`
+        [ "${mode}" = "600" ]
+    - run: |
+        mode=`stat --printf '%a' /etc/cron.allow`
+        [ "${mode}" = "600" ]
+
+- section: 5.2.1
+  description: Ensure permissions on /etc/ssh/sshd_config are configured
+  audit:
+    - run: |
+        mode=`stat --printf '%a' /etc/ssh/sshd_config`
+        [ "${mode}" = "600" ]
+
+- section: 5.2.2
+  description: Ensure SSH Protocol is set to 2
+  audit:
+    - run: grep -E "^Protocol\s+2$" /etc/ssh/sshd_config
+
+- section: 5.2.3
+  description: Ensure SSH LogLevel is set to INFO
+  audit:
+    - run: grep -E "^LogLevel\s+INFO$" /etc/ssh/sshd_config
+
+- section: 5.2.4
+  description: Ensure SSH X11 forwarding is disabled
+  audit:
+    - run: grep -E "^X11Forwarding\s+no$" /etc/ssh/sshd_config
+
+- section: 5.2.5
+  description: Ensure SSH MaxAuthTries is set to 4 or less
+  audit:
+    - run: grep -E "^MaxAuthTries\s+4$" /etc/ssh/sshd_config
+
+- section: 5.2.6
+  description: Ensure SSH IgnoreRhosts is enabled
+  audit:
+    - run: grep -E "^IgnoreRhosts\s+yes$" /etc/ssh/sshd_config
+
+- section: 5.2.7
+  description: Ensure SSH HostbasedAuthentication is disabled
+  audit:
+    - run: grep -E "^HostbasedAuthentication\s+no$" /etc/ssh/sshd_config
+
+- section: 5.2.8
+  description: Ensure SSH root login is disabled
+  audit:
+    - run: grep -E "^PermitRootLogin\s+no$" /etc/ssh/sshd_config
+
+- section: 5.2.9
+  description: Ensure SSH PermitEmptyPasswords is disabled
+  audit:
+    - run: grep -E "^PermitEmptyPasswords\s+no$" /etc/ssh/sshd_config
+
+- section: 5.2.10
+  description: Ensure SSH PermitUserEnvironment is disabled
+  audit:
+    - run: grep -E "^PermitUserEnvironment\s+no$" /etc/ssh/sshd_config
+
+- section: 5.2.11
+  description: Ensure only approved ciphers are used
+  audit:
+    - run: grep -E "^Ciphers\s+aes256-ctr,aes192-ctr,aes128-ctr$" /etc/ssh/sshd_config
+
+- section: 5.2.12
+  description: Ensure only approved MAC algorithms are used
+  audit:
+    - run: grep -E "^MACs\s+hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-512,hmac-sha2-256,umac-128@openssh.com" /etc/ssh/sshd_config
+
+- section: 5.2.13
+  description: Ensure SSH Idle Timeout Interval is configured
+  audit:
+    - run: grep -E "^ClientAliveInterval\s+300$" /etc/ssh/sshd_config
+    - run: grep -E "^ClientAliveCountMax\s+0$" /etc/ssh/sshd_config
+
+- section: 5.2.14
+  description: Ensure SSH LoginGraceTime is set to one minute or less
+  audit:
+    - run: grep -E "^LoginGraceTime\s+60$" /etc/ssh/sshd_config
+
+- section: 5.2.15
+  description: Ensure SSH access is limited
+  audit:
+    - run: grep -E "^AllowUsers\s+.+" /etc/ssh/sshd_config
+    - run: grep -E "^AllowGroups\s+.+" /etc/ssh/sshd_config
+    - run: grep -E "^DenyUsers\s+.+" /etc/ssh/sshd_config
+    - run: grep -E "^DenyGroups\s+.+" /etc/ssh/sshd_config
+  mode: Any
+
+- section: 5.2.16
+  description: Ensure SSH warning banner is configured
+  audit:
+    - run: grep -E "^Banner\s+/etc/issue.net$" /etc/ssh/sshd_config
+
+- section: 5.3.1
+  description: Ensure password creation requirements are configured
+  audit:
+    - run: grep -E 'password\s+requisite\s+pam_pwquality.so.*\s+try_first_pass' /etc/pam.d/password-auth
+    - run: grep -E 'password\s+requisite\s+pam_pwquality.so.*\s+retry=3[^0-9]' /etc/pam.d/password-auth
+    - run: grep -E 'password\s+requisite\s+pam_pwquality.so.*\s+try_first_pass' /etc/pam.d/system-auth
+    - run: grep -E 'password\s+requisite\s+pam_pwquality.so.*\s+retry=3[^0-9]' /etc/pam.d/system-auth
+    - run: grep ^minlen=14 /etc/security/pwquality.conf
+    - run: grep ^dcredit=-1 /etc/security/pwquality.conf
+    - run: grep ^lcredit=-1 /etc/security/pwquality.conf
+    - run: grep ^ocredit=-1 /etc/security/pwquality.conf
+    - run: grep ^ucredit=-1 /etc/security/pwquality.conf
+
+- section: 5.3.2
+  description: Ensure lockout for failed password attempts is configured
+  audit:
+    - run: |
+        sed -n '
+        /auth[ ^t]*required[ ^t]*pam_faillock\.so/{:start /auth[ ^t]*sufficient[ ^t]*pam_faillock\.so/!{N; b start}
+          /auth[ ^t]*\[success=1 default=bad\][ ^t]*pam_unix.so/q}
+        $q1' /etc/pam.d/password-auth
+    - run: |
+        sed -n '
+        /auth[ ^t]*required[ ^t]*pam_faillock\.so/{:start /auth[ ^t]*sufficient[ ^t]*pam_faillock\.so/!{N; b start}
+          /auth[ ^t]*\[success=1 default=bad\][ ^t]*pam_unix.so/q}
+        $q1' /etc/pam.d/system-auth
+
+- section: 5.3.3
+  description: Ensure password reuse is limited
+  audit:
+    - run: egrep '^password\s+sufficient\s+pam_unix.so.*\s+remember=5[^0-9]' /etc/pam.d/password-auth
+    - run: egrep '^password\s+sufficient\s+pam_unix.so.*\s+remember=5[^0-9]' /etc/pam.d/system-auth
+
+- section: 5.3.4
+  description: Ensure password hashing algorithm is SHA-512
+  audit:
+    - run: egrep '^password\s+sufficient\s+pam_unix.so.*\s+sha512' /etc/pam.d/password-auth
+    - run: egrep '^password\s+sufficient\s+pam_unix.so.*\s+sha512' /etc/pam.d/system-auth
+
+- section: 5.4.1.1
+  description: Ensure password expiration is 90 days or less
+  audit:
+    - run: grep -E 'PASS_MAX_DAYS\s+90$' /etc/login.defs
+
+- section: 5.4.1.2
+  description: Ensure minimum days between password changes is 7 or more
+  audit:
+    - run: grep -E 'PASS_MIN_DAYS\s+7$' /etc/login.defs
+
+- section: 5.4.1.3
+  description: Ensure password expiration warning days is 7 or more
+  audit:
+    - run: grep -E 'PASS_WARN_AGE\s+7$' /etc/login.defs
+
+- section: 5.4.1.4
+  description: Ensure inactive password lock is 30 days or less
+  audit:
+    - run: useradd -D | grep -E 'INACTIVE=30$'
+
+- section: 5.4.2
+  description: Ensure system accounts are non-login
+  audit:
+    - run: |
+        out=`egrep -v "^\+" /etc/passwd | awk -F: '($1!="root" && $1!="sync" && $1!="shutdown" && $1!="halt" && $3<500 && $7!="/sbin/nologin" && $7!="/bin/false") {print}'`
+        [ -z "${out}" ]
+
+- section: 5.4.3
+  description: Ensure default group for the root account is GID 0
+  audit:
+    - run: |
+        out=`grep "^root:" /etc/passwd | cut -f4 -d:`
+        [ "${out}" = "0" ]
+
+- section: 5.4.4
+  description: Ensure default user umask is 027 or more restrictive
+  audit:
+    - run: grep -E "^\s*umask\s+027$" /etc/bashrc
+    - run: grep -E "^\s*umask\s+027$" /etc/profile
+
+- section: '5.5'
+  description: Ensure access to the su command is restricted
+  audit:
+    - run: grep -E 'auth\s+required\s+pam_wheel.so\s+use_uid' /etc/pam.d/su
+    - run: |
+        ret=0
+        for user in root ec2-user; do
+            grep -E "^wheel:x:10:([^:]*,)?${user}" /etc/group || ret=1
+        done
+        exit ${ret}
+
+- section: 6.1.1
+  description: Audit system file permissions
+  audit:
+    - run: rpm -Va --nomtime --nosize --nomd5 --nolinkto
+
+- section: 6.1.2
+  description: Ensure permissions on /etc/passwd are configured
+  audit:
+    - run: |
+        mode=`stat --printf '%a' /etc/passwd`
+        [ "${mode}" = "644" ]
+
+- section: 6.1.3
+  description: Ensure permissions on /etc/shadow are configured
+  audit:
+    - run: |
+        mode=`stat --printf '%a' /etc/shadow`
+        [ "${mode}" = "0" ]
+
+- section: 6.1.4
+  description: Ensure permissions on /etc/group are configured
+  audit:
+    - run: |
+        mode=`stat --printf '%a' /etc/group`
+        [ "${mode}" = "644" ]
+
+- section: 6.1.5
+  description: Ensure permissions on /etc/gshadow are configured
+  audit:
+    - run: |
+        mode=`stat --printf '%a' /etc/gshadow`
+        [ "${mode}" = "0" ]
+
+- section: 6.1.6
+  description: Ensure permissions on /etc/passwd- are configured
+  audit:
+    - run: |
+        mode=`stat --printf '%a' /etc/passwd-`
+        [ "${mode}" = "600" ]
+
+- section: 6.1.7
+  description: Ensure permissions on /etc/shadow- are configured
+  audit:
+    - run: |
+        mode=`stat --printf '%a' /etc/shadow-`
+        [ "${mode}" = "600" ]
+
+- section: 6.1.8
+  description: Ensure permissions on /etc/group- are configured
+  audit:
+    - run: |
+        mode=`stat --printf '%a' /etc/group-`
+        [ "${mode}" = "600" ]
+
+- section: 6.1.9
+  description: Ensure permissions on /etc/gshadow- are configured
+  audit:
+    - run: |
+        mode=`stat --printf '%a' /etc/gshadow-`
+        [ "${mode}" = "600" ]
+
+- section: 6.1.10
+  description: Ensure no world writable files exist
+  audit:
+    - run: |
+        out=`df --local -P | awk {'if (NR!=1) print $6'} | xargs -I '{}' find '{}' -xdev -type f -perm -0002`
+        [ -z "${out}" ]
+
+- section: 6.1.11
+  description: Ensure no unowned files or directories exist
+  audit:
+    - run: |
+        out=`df --local -P | awk {'if (NR!=1) print $6'} | xargs -I '{}' find '{}' -xdev -nouser`
+        [ -z "${out}" ]
+
+- section: 6.1.12
+  description: Ensure no ungrouped files or directories exist
+  audit:
+    - run: |
+        out=`df --local -P | awk {'if (NR!=1) print $6'} | xargs -I '{}' find '{}' -xdev -nogroup`
+        [ -z "${out}" ]
+
+- section: 6.1.13
+  description: Audit SUID executables
+  audit:
+    - run: |
+        allowed_suid='/bin/su|/bin/umount|/bin/mount|/lib64/dbus-1/dbus-daemon-launch-helper|/usr/bin/chsh|/usr/bin/at|/usr/bin/newgrp|/usr/bin/chage|/usr/bin/gpasswd|/usr/bin/passwd|/usr/bin/crontab|/usr/bin/chfn|/usr/bin/sudo|/usr/sbin/ccreds_chkpwd|/usr/sbin/usernetctl|/usr/sbin/seunshare|/sbin/unix_chkpwd|/sbin/mount.nfs|/sbin/pam_timestamp_check'
+        out=`df --local -P | awk {'if (NR!=1) print $6'} | xargs -I '{}' find '{}' -xdev -type f -perm -4000 | grep -vE "${allowed_suid}"`
+        [ -z "${out}" ]
+
+- section: 6.1.14
+  description: Audit SGID executables
+  audit:
+    - run: |
+        allowed_sgid='/bin/cgclassify|/bin/cgexec|/usr/libexec/openssh/ssh-keysign|/usr/libexec/utempter/utempter|/usr/bin/ssh-agent|/usr/bin/lockfile|/usr/bin/write|/usr/bin/wall|/usr/bin/screen|/usr/sbin/postdrop|/usr/sbin/postqueue|/sbin/netreport'
+        out=`df --local -P | awk {'if (NR!=1) print $6'} | xargs -I '{}' find '{}' -xdev -type f -perm -2000 | grep -vE "${allowed_sgid}"`
+        [ -z "${out}" ]
+
+- section: 6.2.1
+  description: Ensure password fields are not empty
+  audit:
+    - run: |
+        cat /etc/shadow | awk -F: '($2 == "" ) { print $1 " does not have a password "}'
+      expect: '^$'
+
+- section: 6.2.2
+  description: Ensure no legacy "+" entries exist in /etc/passwd
+  audit:
+    - run: |
+        out=`grep '^+:' /etc/passwd`
+        [ -z "${out}" ]
+
+- section: 6.2.3
+  description: Ensure no legacy "+" entries exist in /etc/shadow
+  audit:
+    - run: |
+        out=`grep '^+:' /etc/shadow`
+        [ -z "${out}" ]
+
+- section: 6.2.4
+  description: Ensure no legacy "+" entries exist in /etc/group
+  audit:
+    - run: |
+        out=`grep '^+:' /etc/group`
+        [ -z "${out}" ]
+
+- section: 6.2.5
+  description: Ensure root is the only UID 0 account
+  audit:
+    - run: |
+        out=`cat /etc/passwd | awk -F: '($3 == 0) { print $1 }'`
+        [ "${out}" = "root" ]
+
+- section: 6.2.6
+  description: Ensure root PATH Integrity
+  audit:
+    - run: |
+        if [ "`echo $PATH | grep :: `" != "" ]; then
+            echo "Empty Directory in PATH (::)"
+        fi
+
+        if [ "`echo $PATH | grep :$`" != "" ]; then
+            echo "Trailing : in PATH"
+        fi
+
+        p=`echo $PATH | sed -e 's/::/:/' -e 's/:$//' -e 's/:/ /g'`
+        set -- $p
+        while [ "$1" != "" ]; do
+            if [ "$1" = "." ]; then
+                echo "PATH contains ."
+                shift
+                continue
+            fi
+            if [ -d $1 ]; then
+                dirperm=`ls -ldH $1 | cut -f1 -d" "`
+                if [ `echo $dirperm | cut -c6 ` != "-" ]; then
+                    echo "Group Write permission set on directory $1"
+                fi
+                if [ `echo $dirperm | cut -c9 ` != "-" ]; then
+                    echo "Other Write permission set on directory $1"
+                fi
+                dirown=`ls -ldH $1 | awk '{print $3}'`
+                if [ "$dirown" != "root" ] ; then
+                    echo $1 is not owned by root
+                fi
+            else
+                echo $1 is not a directory
+            fi
+            shift
+        done
+      expect: '^$'
+
+- section: 6.2.7
+  description: "Ensure all users' home directories exist"
+  audit:
+    - run: |
+        cat /etc/passwd | awk -F: '{ print $1 " " $3 " " $6 }' | while read user uid dir; do
+            if [ $uid -ge 500 -a ! -d "$dir" -a $user != "nfsnobody" ]; then
+                echo "The home directory ($dir) of user $user does not exist."
+            fi
+        done
+      expect: '^$'
+
+- section: 6.2.8
+  description: "Ensure users' home directories permissions are 750 or more restrictive"
+  audit:
+    - run: |
+        for dir in `cat /etc/passwd | egrep -v '(root|halt|sync|shutdown)' | awk -F: '($7 != "/sbin/nologin") { print $6 }'`; do
+            dirperm=`ls -ld $dir | cut -f1 -d" "`
+            if [ `echo $dirperm | cut -c6 ` != "-" ]; then
+                echo "Group Write permission set on directory $dir"
+            fi
+            if [ `echo $dirperm | cut -c8 ` != "-" ]; then
+                echo "Other Read permission set on directory $dir"
+            fi
+            if [ `echo $dirperm | cut -c9 ` != "-" ]; then
+                echo "Other Write permission set on directory $dir"
+            fi
+            if [ `echo $dirperm | cut -c10 ` != "-" ]; then
+                echo "Other Execute permission set on directory $dir"
+            fi
+        done
+      expect: '^$'
+
+- section: 6.2.9
+  description: Ensure users own their home directories
+  audit:
+    - run: |
+        cat /etc/passwd | awk -F: '{ print $1 " " $3 " " $6 }' | while read user uid dir; do
+            if [ $uid -ge 500 -a -d "$dir" -a $user != "nfsnobody" ]; then
+                owner=$(stat -L -c "%U" "$dir")
+                if [ "$owner" != "$user" ]; then
+                    echo "The home directory ($dir) of user $user is owned by $owner."
+                fi
+            fi
+        done
+      expect: '^$'
+
+- section: 6.2.10
+  description: "Ensure users' dot files are not group or world writable"
+  audit:
+    - run: |
+        for dir in `cat /etc/passwd | egrep -v '(root|sync|halt|shutdown)' | awk -F: '($7 != "/sbin/nologin") { print $6 }'`; do
+            for file in $dir/.[A-Za-z0-9]*; do
+                if [ ! -h "$file" -a -f "$file" ]; then
+                    fileperm=`ls -ld $file | cut -f1 -d" "`
+                    if [ `echo $fileperm | cut -c6 ` != "-" ]; then
+                        echo "Group Write permission set on file $file"
+                    fi
+                    if [ `echo $fileperm | cut -c9 ` != "-" ]; then
+                        echo "Other Write permission set on file $file"
+                    fi
+                fi
+            done
+        done
+      expect: '^$'
+
+- section: 6.2.11
+  description: Ensure no users have .forward files
+  audit:
+    - run: |
+        for dir in `cat /etc/passwd | awk -F: '{ print $6 }'`; do
+            if [ ! -h "$dir/.forward" -a -f "$dir/.forward" ]; then
+                echo ".forward file $dir/.forward exists"
+            fi
+        done
+      expect: '^$'
+
+- section: 6.2.12
+  description: Ensure no users have .netrc files
+  audit:
+    - run: |
+        for dir in `cat /etc/passwd | awk -F: '{ print $6 }'`; do
+            if [ ! -h "$dir/.netrc" -a -f "$dir/.netrc" ]; then
+                echo ".netrc file $dir/.netrc exists"
+            fi
+        done
+      expect: '^$'
+
+- section: 6.2.13
+  description: "Ensure users' .netrc Files are not group or world accessible"
+  audit:
+    - run: |
+        for dir in `cat /etc/passwd | egrep -v '(root|sync|halt|shutdown)' | awk -F: '($7 != "/sbin/nologin") { print $6 }'`; do
+            for file in $dir/.netrc; do
+                if [ ! -h "$file" -a -f "$file" ]; then
+                    fileperm=`ls -ld $file | cut -f1 -d" "`
+                    if [ `echo $fileperm | cut -c5 ` != "-" ]; then
+                        echo "Group Read set on $file"
+                    fi
+                    if [ `echo $fileperm | cut -c6 ` != "-" ]; then
+                        echo "Group Write set on $file"
+                    fi
+                    if [ `echo $fileperm | cut -c7 ` != "-" ]; then
+                        echo "Group Execute set on $file"
+                    fi
+                    if [ `echo $fileperm | cut -c8 ` != "-" ]; then
+                        echo "Other Read set on $file"
+                    fi
+                    if [ `echo $fileperm | cut -c9 ` != "-" ]; then
+                        echo "Other Write set on $file"
+                    fi
+                    if [ `echo $fileperm | cut -c10 ` != "-" ]; then
+                        echo "Other Execute set on $file"
+                    fi
+                fi
+            done
+        done
+      expect: '^$'
+
+- section: 6.2.14
+  description: Ensure no users have .rhosts files
+  audit:
+    - run: |
+        for dir in `cat /etc/passwd | egrep -v '(root|halt|sync|shutdown)' | awk -F: '($7 != "/sbin/nologin") { print $6 }'`; do
+            for file in $dir/.rhosts; do
+                if [ ! -h "$file" -a -f "$file" ]; then
+                    echo ".rhosts file in $dir"
+                fi
+            done
+        done
+      expect: '^$'
+
+- section: 6.2.15
+  description: Ensure all groups in /etc/passwd exist in /etc/group
+  audit:
+    - run: |
+        for i in $(cut -s -d: -f4 /etc/passwd | sort -u ); do
+            grep -q -P "^.*?:[^:]*:$i:" /etc/group
+            if [ ${?} -ne 0 ]; then
+                echo "Group $i is referenced by /etc/passwd but does not exist in /etc/group"
+            fi
+        done
+      expect: '^$'
+
+- section: 6.2.16
+  description: Ensure no duplicate UIDs exist
+  audit:
+    - run: |
+        cat /etc/passwd | cut -f3 -d":" | sort -n | uniq -c | while read x ; do
+            [ -z "${x}" ] && break
+            set - $x
+            if [ $1 -gt 1 ]; then
+                users=`awk -F: '($3 == n) { print $1 }' n=$2 /etc/passwd | xargs`
+                echo "Duplicate UID ($2): ${users}"
+            fi
+        done
+      expect: '^$'
+
+- section: 6.2.17
+  description: Ensure no duplicate GIDs exist
+  audit:
+    - run: |
+        cat /etc/group | cut -f3 -d":" | sort -n | uniq -c | while read x ; do
+            [ -z "${x}" ] && break
+            set - $x
+            if [ $1 -gt 1 ]; then
+                groups=`awk -F: '($3 == n) { print $1 }' n=$2 /etc/group | xargs`
+                echo "Duplicate GID ($2): ${groups}"
+            fi
+        done
+      expect: '^$'
+
+- section: 6.2.18
+  description: Ensure no duplicate user names exist
+  audit:
+    - run: |
+        cat /etc/passwd | cut -f1 -d":" | sort -n | uniq -c | while read x ; do
+            [ -z "${x}" ] && break
+            set - $x
+            if [ $1 -gt 1 ]; then
+                uids=`awk -F: '($1 == n) { print $3 }' n=$2 /etc/passwd | xargs`
+                echo "Duplicate User Name ($2): ${uids}"
+            fi
+        done
+      expect: '^$'
+
+- section: 6.2.19
+  description: Ensure no duplicate group names exist
+  audit:
+    - run: |
+        cat /etc/group | cut -f1 -d":" | sort -n | uniq -c | while read x ; do
+            [ -z "${x}" ] && break
+            set - $x
+            if [ $1 -gt 1 ]; then
+                gids=`gawk -F: '($1 == n) { print $3 }' n=$2 /etc/group | xargs`
+                echo "Duplicate Group Name ($2): ${gids}"
+            fi
+        done
+      expect: '^$'
