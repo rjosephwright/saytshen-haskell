@@ -8,6 +8,7 @@ module Scan
   , AuditStep(..)
   , Benchmark(..)
   , BenchmarkResult(..)
+  , Passed(..)
   ) where
 
 import Prelude hiding (writeFile)
@@ -54,7 +55,7 @@ data BenchmarkResult = BenchmarkResult
   , skipR :: Maybe Text
   } deriving (Generic, Show)
 
-newtype Passed = Passed { unPassed :: Bool } deriving Show
+newtype Passed = Passed { unPassed :: Bool } deriving (Eq, Show)
 
 instance Csv.ToField Passed where
   toField (Passed True) = "true"

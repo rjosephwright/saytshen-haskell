@@ -98,7 +98,7 @@ runOneBenchmark =
         , mode = Nothing, skip = Nothing
         } in do
     result <- runBenchmark benchmark
-    (map (\res -> (passedR res)) result) @?= ([False] :: [Bool])
+    (map (\res -> (passedR res)) result) @?= [Passed False]
 
 runOneBenchmarkWithSkip :: Assertion
 runOneBenchmarkWithSkip =
@@ -114,7 +114,7 @@ runOneBenchmarkWithSkip =
         , mode = Nothing, skip = Just "reasons"
         } in do
     result <- runBenchmark benchmark
-    (map (\res -> (passedR res)) result) @?= ([True] :: [Bool])
+    (map (\res -> (passedR res)) result) @?= [Passed True]
 
 runTwoBenchmarks :: Assertion
 runTwoBenchmarks =
@@ -142,4 +142,4 @@ runTwoBenchmarks =
         , mode = Nothing, skip = Nothing
         }] in do
     result <- runBenchmarks benchmarks
-    (map (\res -> (passedR res)) result) @?= ([False, False] :: [Bool])
+    (map (\res -> (passedR res)) result) @?= [Passed False, Passed False]
