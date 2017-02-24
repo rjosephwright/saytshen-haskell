@@ -81,7 +81,7 @@ runScript script = readProcessWithExitCode "/bin/sh" ["-c", unpack script] ""
 
 outputMatches :: String -> Maybe Text -> Bool
 outputMatches _ Nothing = True
-outputMatches out (Just regex) = (out =~ unpack regex)
+outputMatches out (Just regex) = out =~ unpack regex
 
 benchmarkSucceeded :: Benchmark -> [(AuditStep, CommandResult)] -> Bool
 benchmarkSucceeded benchmark outputs =
