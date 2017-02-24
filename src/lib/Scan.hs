@@ -143,6 +143,6 @@ runScan spec = do
     Right bs -> do
       benchmarkResults <- runBenchmarks bs
       report <- return $ createReport benchmarkResults
-      writeFile "report.csv" report
+      writeFile "results.csv" report
       return $ Right (all (\br -> unPassed $ passedR br) benchmarkResults)
     Left err -> return $ Left (prettyPrintParseException err)
