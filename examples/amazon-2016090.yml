@@ -855,16 +855,16 @@
     - run: grep -- '-a always,exit -F arch=b64 -S creat -S open -S openat -S truncate -S ftruncate -F exit=-EPERM -F auid>=500 -F auid!=4294967295 -k access' /etc/audit/audit.rules
     - run: grep -- '-a always,exit -F arch=b32 -S creat -S open -S openat -S truncate -S ftruncate -F exit=-EPERM -F auid>=500 -F auid!=4294967295 -k access' /etc/audit/audit.rules
 
-# - section: 4.1.12
-#   description: Ensure use of privileged commands is collected
-#   audit:
-#     - run: |
-#        ret=0
-#        priv_commands=`find / -xdev \( -perm -4000 -o -perm -2000 \) -type f`
-#        for command in ${priv_commands}; do
-#            grep -- "-a always,exit -F path=${command} -F perm=x -F auid>=500 -F auid!=4294967295 -k privileged" /etc/audit/audit.rules || ret=1
-#        done
-#        exit ${ret}
+- section: 4.1.12
+  description: Ensure use of privileged commands is collected
+  audit:
+    - run: |
+       ret=0
+       priv_commands=`find / -xdev \( -perm -4000 -o -perm -2000 \) -type f`
+       for command in ${priv_commands}; do
+           grep -- "-a always,exit -F path=${command} -F perm=x -F auid>=500 -F auid!=4294967295 -k privileged" /etc/audit/audit.rules || ret=1
+       done
+       exit ${ret}
 
 - section: 4.1.13
   description: Ensure successful file system mounts are collected
