@@ -8,6 +8,7 @@ import qualified Data.Yaml as Y
 import Text.RawString.QQ
 
 import Scan
+import System.Exit
 
 main :: IO ()
 main = defaultMain $ testGroup "all-tests" tests
@@ -18,11 +19,45 @@ tests =
 
 ymlTests :: [TestTree]
 ymlTests =
-  [ testCase "Parse the YAML" parseOneBenchmark
-  , testCase "Parse more YAML" parseTwoBenchmarks
-  , testCase "Run a benchmark" runOneBenchmark
-  , testCase "Run a benchmark that should be skipped" runOneBenchmarkWithSkip
-  , testCase "Run two benchmarks" runTwoBenchmarks
+  [ testCase
+      "Parse the YAML"
+      parseOneBenchmark
+  , testCase
+      "Parse more YAML"
+      parseTwoBenchmarks
+  , testCase
+      "Benchmark succeeds by exit status"
+      runBenchmarkSucceeded1
+  , testCase
+      "Benchmark fails by exit status"
+      runBenchmarkSucceeded2
+  , testCase
+      "Multiple benchmarks succeed by exit status"
+      runBenchmarkSucceeded3
+  , testCase
+      "Multiple benchmarks succeed by exit status but one has unexpected output"
+      runBenchmarkSucceeded4
+  , testCase
+      "Multiple benchmarks succeed by exit status and one has expected output"
+      runBenchmarkSucceeded5
+  , testCase
+      "Multiple benchmarks succeed by exit status and one has unexpected output but mode is Any"
+      runBenchmarkSucceeded6
+  , testCase
+      "One of multiple benchmarks fails by exit status but mode is Any"
+      runBenchmarkSucceeded7
+  , testCase
+      "One of multiple benchmarks fails by exit status and other has unexpectd output"
+      runBenchmarkSucceeded8
+  , testCase
+      "Run a benchmark"
+      runOneBenchmark
+  , testCase
+      "Run a benchmark that should be skipped"
+      runOneBenchmarkWithSkip
+  , testCase
+      "Run two benchmarks"
+      runTwoBenchmarks
   ]
 
 parseOneBenchmark :: Assertion
@@ -38,10 +73,10 @@ parseOneBenchmark =
 |]
       parsed = Y.decodeEither yaml :: Either String [Benchmark] in
     case parsed of
-      Right [benchmark] -> do
-        (section benchmark)        @?= ("1.1.1.1" :: Text)
-        (length (audit benchmark)) @?= (2 :: Int)
-        (mode benchmark)           @?= (Nothing :: Maybe Mode)
+      Right [bm] -> do
+        (section bm)        @?= ("1.1.1.1" :: Text)
+        (length (audit bm)) @?= (2 :: Int)
+        (mode bm)           @?= (Nothing :: Maybe Mode)
       Right v -> assertFailure (show v)
       Left e -> assertFailure (show e)
 
@@ -83,9 +118,80 @@ parseTwoBenchmarks =
       Right v -> assertFailure (show v)
       Left e -> assertFailure (show e)
 
+auditStep :: AuditStep
+auditStep = AuditStep { run = "/bin/noexist"
+                      , expect = Nothing
+                      }
+
+benchmark :: Benchmark
+benchmark = Benchmark { section = "1.1.100"
+                      , description = "Ensure noexist runs correctly"
+                      , audit = [auditStep]
+                      , mode = Nothing, skip = Nothing
+                      }
+
+runBenchmarkSucceeded1 :: Assertion
+runBenchmarkSucceeded1 =
+    benchmarkSucceeded benchmark [(auditStep, (ExitSuccess, "", ""))] @?= True
+
+runBenchmarkSucceeded2 :: Assertion
+runBenchmarkSucceeded2 =
+    benchmarkSucceeded benchmark [(auditStep, (ExitFailure 2, "", ""))] @?= False
+
+runBenchmarkSucceeded3 :: Assertion
+runBenchmarkSucceeded3 =
+  let auditStep2 = auditStep { expect = Just "[Ss]ome.output" }
+      benchmark2 = benchmark { audit = [auditStep, auditStep2] }
+  in
+    benchmarkSucceeded benchmark2 [(auditStep, (ExitFailure 2, "", "")),
+                                   (auditStep2, (ExitFailure 2, "", ""))] @?= False
+
+runBenchmarkSucceeded4 :: Assertion
+runBenchmarkSucceeded4 =
+  let auditStep2 = auditStep { expect = Just "[Ss]ome.output" }
+      benchmark2 = benchmark { audit = [auditStep, auditStep2] }
+  in
+    benchmarkSucceeded benchmark2 [(auditStep, (ExitSuccess, "", "")),
+                                   (auditStep2, (ExitSuccess, "wrong output", ""))] @?= False
+
+runBenchmarkSucceeded5 :: Assertion
+runBenchmarkSucceeded5 =
+  let auditStep2 = auditStep { expect = Just "[Ss]ome.output" }
+      benchmark2 = benchmark { audit = [auditStep, auditStep2] }
+  in
+    benchmarkSucceeded benchmark2 [(auditStep, (ExitSuccess, "", "")),
+                                   (auditStep2, (ExitSuccess, "some output", ""))] @?= True
+
+runBenchmarkSucceeded6 :: Assertion
+runBenchmarkSucceeded6 =
+  let auditStep2 = auditStep { expect = Just "[Ss]ome.output" }
+      benchmark2 = benchmark { audit = [auditStep, auditStep2] }
+      benchmark3 = benchmark2 { mode = Just Any }
+  in do
+    benchmarkSucceeded benchmark3 [(auditStep, (ExitSuccess, "", "")),
+                                   (auditStep2, (ExitSuccess, "wrong output", ""))] @?= True
+
+runBenchmarkSucceeded7 :: Assertion
+runBenchmarkSucceeded7 =
+  let auditStep2 = auditStep { expect = Just "[Ss]ome.output" }
+      benchmark2 = benchmark { audit = [auditStep, auditStep2] }
+      benchmark3 = benchmark2 { mode = Just Any }
+  in do
+    benchmarkSucceeded benchmark3 [(auditStep, (ExitFailure 1, "", "")),
+                                   (auditStep2, (ExitSuccess, "some output", ""))] @?= True
+
+runBenchmarkSucceeded8 :: Assertion
+runBenchmarkSucceeded8 =
+  let auditStep2 = auditStep { expect = Just "[Ss]ome.output" }
+      benchmark2 = benchmark { audit = [auditStep, auditStep2] }
+      benchmark3 = benchmark2 { mode = Just Any }
+  in do
+    benchmarkSucceeded benchmark3 [(auditStep, (ExitFailure 1, "", "")),
+                                   (auditStep2, (ExitSuccess, "wrong output", ""))] @?= False
+
 runOneBenchmark :: Assertion
 runOneBenchmark =
-  let benchmark = Benchmark
+  let bm = Benchmark
         { section = "1.1.6"
         , description = "Ensure separate partition exists for /var"
         , audit = [
@@ -97,12 +203,12 @@ runOneBenchmark =
           ]
         , mode = Nothing, skip = Nothing
         } in do
-    result <- runBenchmark benchmark
+    result <- runBenchmark bm
     (map (\res -> (passedR res)) result) @?= [Passed False]
 
 runOneBenchmarkWithSkip :: Assertion
 runOneBenchmarkWithSkip =
-  let benchmark = Benchmark
+  let bm = Benchmark
         { section = "1.1.6"
         , description = "Ensure separate partition exists for /var"
         , audit = [
@@ -113,7 +219,7 @@ runOneBenchmarkWithSkip =
           ]
         , mode = Nothing, skip = Just "reasons"
         } in do
-    result <- runBenchmark benchmark
+    result <- runBenchmark bm
     (map (\res -> (passedR res)) result) @?= [Passed True]
 
 runTwoBenchmarks :: Assertion

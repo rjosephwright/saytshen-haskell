@@ -1,7 +1,8 @@
 {-# LANGUAGE DeriveGeneric, OverloadedStrings, RecordWildCards #-}
 
 module Scan
-  ( runBenchmark
+  ( benchmarkSucceeded
+  , runBenchmark
   , runBenchmarks
   , runScan
   , Mode(..)
@@ -23,6 +24,7 @@ import Data.Yaml (FromJSON, ParseException, decodeFileEither, prettyPrintParseEx
 import GHC.Generics
 import System.Exit
 import System.Process
+import Text.Regex.Posix ((=~))
 
 data Mode = Any | All deriving (Eq, Generic, Show)
 
@@ -77,20 +79,26 @@ type CommandResult = (ExitCode, String, String)
 runScript :: Text -> IO CommandResult
 runScript script = readProcessWithExitCode "/bin/sh" ["-c", unpack script] ""
 
-isSuccess :: Benchmark -> [CommandResult] -> Bool
-isSuccess benchmark outputs =
+outputMatches :: String -> Maybe Text -> Bool
+outputMatches _ Nothing = True
+outputMatches out (Just regex) = (out =~ unpack regex)
+
+benchmarkSucceeded :: Benchmark -> [(AuditStep, CommandResult)] -> Bool
+benchmarkSucceeded benchmark outputs =
   let shouldSkip = isJust $ skip benchmark
-      exitCodes = map (\(ec, _, _) -> ec) outputs
       check = case (fromMaybe All (mode benchmark)) of
         Any -> any
         All -> all
   in
-    shouldSkip || check (== ExitSuccess) exitCodes
+    shouldSkip || check (\(step, (exitCode, out, _)) ->
+                           exitCode == ExitSuccess &&
+                           outputMatches out (expect step))
+                        outputs
 
 benchmarkResultFrom :: Benchmark -> [AuditStep] -> [CommandResult] -> [BenchmarkResult]
 benchmarkResultFrom benchmark steps outputs =
-  let passed = isSuccess benchmark outputs
-      zipped = zip steps outputs
+  let zipped = zip steps outputs
+      passed = benchmarkSucceeded benchmark zipped
   in
     map (\(step, (_, out, err)) ->
            BenchmarkResult
