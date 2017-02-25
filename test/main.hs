@@ -144,7 +144,7 @@ runBenchmarkSucceeded3 =
       benchmark2 = benchmark { audit = [auditStep, auditStep2] }
   in
     benchmarkSucceeded benchmark2 [(auditStep, (ExitFailure 2, "", "")),
-                                   (auditStep2, (ExitFailure 2, "", ""))] @?= False
+                                   (auditStep2, (ExitFailure 2, "some output", ""))] @?= False
 
 runBenchmarkSucceeded4 :: Assertion
 runBenchmarkSucceeded4 =
@@ -165,28 +165,31 @@ runBenchmarkSucceeded5 =
 runBenchmarkSucceeded6 :: Assertion
 runBenchmarkSucceeded6 =
   let auditStep2 = auditStep { expect = Just "[Ss]ome.output" }
-      benchmark2 = benchmark { audit = [auditStep, auditStep2] }
-      benchmark3 = benchmark2 { mode = Just Any }
-  in do
-    benchmarkSucceeded benchmark3 [(auditStep, (ExitSuccess, "", "")),
+      benchmark2 = benchmark { audit = [auditStep, auditStep2]
+                             , mode = Just Any
+                             }
+  in
+    benchmarkSucceeded benchmark2 [(auditStep, (ExitSuccess, "", "")),
                                    (auditStep2, (ExitSuccess, "wrong output", ""))] @?= True
 
 runBenchmarkSucceeded7 :: Assertion
 runBenchmarkSucceeded7 =
-  let auditStep2 = auditStep { expect = Just "[Ss]ome.output" }
-      benchmark2 = benchmark { audit = [auditStep, auditStep2] }
-      benchmark3 = benchmark2 { mode = Just Any }
-  in do
-    benchmarkSucceeded benchmark3 [(auditStep, (ExitFailure 1, "", "")),
-                                   (auditStep2, (ExitSuccess, "some output", ""))] @?= True
+  let auditStep2 = auditStep { expect = Just "^$" }
+      benchmark2 = benchmark { audit = [auditStep, auditStep2]
+                             , mode = Just Any
+                             }
+  in
+    benchmarkSucceeded benchmark2 [(auditStep, (ExitFailure 1, "", "")),
+                                   (auditStep2, (ExitSuccess, "", ""))] @?= True
 
 runBenchmarkSucceeded8 :: Assertion
 runBenchmarkSucceeded8 =
   let auditStep2 = auditStep { expect = Just "[Ss]ome.output" }
-      benchmark2 = benchmark { audit = [auditStep, auditStep2] }
-      benchmark3 = benchmark2 { mode = Just Any }
-  in do
-    benchmarkSucceeded benchmark3 [(auditStep, (ExitFailure 1, "", "")),
+      benchmark2 = benchmark { audit = [auditStep, auditStep2]
+                             , mode = Just Any
+                             }
+  in
+    benchmarkSucceeded benchmark2 [(auditStep, (ExitFailure 1, "", "")),
                                    (auditStep2, (ExitSuccess, "wrong output", ""))] @?= False
 
 runOneBenchmark :: Assertion
