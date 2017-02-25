@@ -16,9 +16,9 @@ opts = info (spec <**> helper)
     <> header "A tool for running security compliance scans"
   )
 
-main :: IO ()
-main = execParser opts >>= runScan >>= exitOn >> return ()
-
 exitOn :: Either String Bool -> IO ()
 exitOn (Left e) = putStrLn e >> exitWith (ExitFailure 255)
 exitOn (Right b) = if b then exitSuccess else exitFailure
+
+main :: IO ()
+main = execParser opts >>= runScan >>= exitOn
